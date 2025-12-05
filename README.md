@@ -80,13 +80,16 @@ Perfect while:
 4. multitaskers
 
 
-#Clone The repository
+# Clone The repository
 ```terminal
 git clone https://github.com/pranitdhanade-sys/IIT-Techfest.git
 cd IIT-Techfest.git
 ```
 
-#Run the Website
+# Run the Website
 ```terminal
 python3 app.py
 ```
+
+# Tutorial Video
+[![Watch the video](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://youtu.be/teGNpxdFTwM)
