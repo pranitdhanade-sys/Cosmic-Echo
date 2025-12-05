@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Hub - StellerAtlas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* --- GLOBAL STYLES & HACKATHON "WOW" FACTOR --- */
+        :root {
+            --dark-bg: #03010b;
+            --primary-card-bg: rgba(18, 16, 38, 0.6);
+            --primary-text: #e0e0e0;
+            --accent-color: #3b82f6; /* A vibrant blue */
+            --glow-color: #6d28d9;   /* A deep purple for glows */
+            --correct-color: #22c55e; /* Bright Green */
+            --wrong-color: #ef4444;   /* Bright Red */
+            --border-color: rgba(255, 255, 255, 0.1);
+            --transition-fast: 0.2s ease-out;
+            --transition-medium: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--primary-text);
+            overflow-x: hidden;
+            /* Hackathon Suggestion: Add a background video for maximum impact. 
+               I've prepared the CSS for it. Just add a <video> element after the <body> tag.
+               <video autoplay muted loop id="bg-video">
+                   <source src="your-space-video.mp4" type="video/mp4">
+               </video>
+            */
+            background-image: url('https://www.transparenttextures.com/patterns/stardust.png'); /* A subtle fallback texture */
+        }
+
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        main {
+            padding-top: 120px; /* Space for fixed navbar */
+        }
+
+        section {
+            padding: 80px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* --- NEW: CINEMATIC MAIN HEADING --- */
+        .main-heading {
+            font-size: 4rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 15px var(--glow-color), 0 0 25px var(--glow-color);
+            margin-bottom: -33px;
+            padding: 0 5%;
+        }
+
+        h2 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px var(--glow-color);
+        }
+        
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #f0f0f0;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+        }
+
+
+        /* --- NAVIGATION BAR (UNCHANGED) --- */
+        nav.navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; min-height: 100px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; background: rgba(3, 1, 11, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); user-select: none; transition: background 0.3s ease; gap: 40px; }
+        .navbar-logo img { height: 80px; width: auto; transition: transform var(--transition-fast), filter var(--transition-fast); }
+        .navbar-logo img:hover { transform: scale(1.08); filter: drop-shadow(0 0 8px var(--accent-color)); }
+        .navbar-menu { display: flex; gap: 38px; }
+        .navbar-menu a { color: #ececec; text-decoration: none; font-weight: 600; font-size: 1.04rem; letter-spacing: 0.03em; padding: 8px 15px; transition: color var(--transition-fast); position: relative; }
+        .navbar-menu a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background-color: var(--accent-color); transform: scaleX(0); transform-origin: center; transition: transform var(--transition-fast); }
+        .navbar-menu a:hover { color: #fff; }
+        .navbar-menu a:hover::after { transform: scaleX(1); }
+        .navbar-special { display: flex; align-items: center; white-space: nowrap; position: relative; }
+        .dropdown { display: flex; align-items: center; position: relative; }
+        .dropdown-toggle { font-size: 1rem; font-weight: 600; color: #fff; background: none; border: 1px solid var(--accent-color); border-radius: 9px; padding: 10px 26px; margin-right: 18px; cursor: pointer; letter-spacing: 0.08em; outline: none; transition: all var(--transition-fast); text-transform: uppercase; }
+        .dropdown-toggle:hover { background-color: var(--accent-color); box-shadow: 0 0 15px var(--accent-color); }
+        #timer { font-family: monospace; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.12em; color: var(--primary-text); margin-left: 8px; user-select: none; }
+        .dropdown-menu { display: none; position: absolute; top: calc(100% + 15px); right: 0; background: #111; border-radius: 8px; min-width: 320px; padding: 16px; box-shadow: 0 4px 18px #000a; z-index: 100; flex-direction: column; border: 1px solid var(--border-color); }
+        .dropdown:hover .dropdown-menu, .dropdown:focus-within .dropdown-menu { display: flex; }
+        .dropdown-item { display: flex; align-items: center; margin-bottom: 14px; color: #eee; }
+        .dropdown-item img { width: 60px; height: 60px; border-radius: 9px; margin-right: 16px; object-fit: cover; }
+        .dropdown-item strong { font-weight: 700; display: block; margin-bottom: 4px; }
+        .dropdown-item span { font-size: 0.9rem; color: #ccc; }
+        .dropdown-link { text-align: center; color: var(--accent-color); font-weight: 700; text-decoration: none; margin-top: 12px; cursor: pointer; }
+        .dropdown-link:hover { text-decoration: underline; }
+
+        /* --- COMMUNITY DISCUSSION FEED --- */
+        #community-feed {
+            display: grid;
+            grid-template-columns: 1fr 2.5fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .create-post, .post-card {
+            background: var(--primary-card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+        }
+        
+        .create-post { position: sticky; top: 140px; }
+        .create-post h3 { border: none; padding-left: 0; }
+        .create-post textarea { width: 100%; height: 120px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; color: var(--primary-text); font-family: 'Exo 2', sans-serif; font-size: 1rem; resize: vertical; margin-bottom: 15px; }
+        .create-post textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-color); }
+        .create-post button { width: 100%; padding: 12px; background: var(--accent-color); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all var(--transition-fast); }
+        .create-post button:hover { background: #fff; color: var(--accent-color); box-shadow: 0 0 15px #fff; }
+        
+        .posts-container { /* NEW: Wrapper for filters and list */
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .post-filters { /* NEW: Filter buttons container */
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .post-filters button {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-fast);
+        }
+
+        .post-filters button:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .post-filters button.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .posts-list { display: flex; flex-direction: column; gap: 25px; }
+
+        .post-card {
+            /* NEW: Added animation for new post creation */
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .post-card:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); }
+        .post-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .post-header img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid var(--accent-color); }
+        .post-user { font-weight: 700; color: #fff; }
+        .post-timestamp { font-size: 0.85rem; color: #aaa; }
+        .post-content { line-height: 1.6; margin-bottom: 20px; }
+        
+        .post-actions { display: flex; gap: 20px; border-top: 1px solid var(--border-color); padding-top: 15px; position: relative; /* For share menu positioning */ }
+        .post-actions button { background: none; border: none; color: #aaa; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: color var(--transition-fast), transform var(--transition-fast); }
+        .post-actions button:hover { color: var(--accent-color); transform: scale(1.1); }
+        
+        /* --- NEW: Like Button Animation --- */
+        .post-actions .like-btn.liked {
+            color: #ff5555; /* YouTube's like red */
+        }
+        .post-actions .like-btn .fa-heart {
+            transition: transform 0.2s ease;
+        }
+        .post-actions .like-btn.liked .fa-heart {
+            animation: like-anim 0.4s ease;
+        }
+        @keyframes like-anim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- NEW: Share Button Menu --- */
+        .share-menu {
+            position: absolute;
+            bottom: calc(100% + 10px); /* Position above the button */
+            right: 0;
+            background: #1c1a3a;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            gap: 15px;
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 10;
+        }
+        .share-menu.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .share-menu a {
+            color: var(--primary-text);
+            font-size: 1.5rem;
+            transition: color var(--transition-fast), transform var(--transition-fast);
+        }
+        .share-menu a:hover {
+            color: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        /* --- NEW: Comment Section --- */
+        .comment-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out, padding-top 0.5s ease-out;
+        }
+        .comment-section.visible {
+            max-height: 500px; /* Adjust as needed */
+            opacity: 1;
+        }
+        .comments-display .comment {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+        }
+        .comments-display .comment strong { color: #fff; }
+        .comment-form { display: flex; gap: 10px; margin-top: 15px; }
+        .comment-form input { flex-grow: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--primary-text); font-family: 'Exo 2', sans-serif; font-size: 0.9rem; }
+        .comment-form input:focus { outline: none; border-color: var(--accent-color); }
+        .comment-form button { padding: 10px 15px; background: var(--accent-color); color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color var(--transition-fast); }
+        .comment-form button:hover { background-color: #fff; color: var(--accent-color); }
+
+        /* --- INTERACTIVE POLL SLIDER --- */
+        #poll-section { padding-top: 60px; }
+        .poll-slider-container { display: flex; gap: 30px; overflow-x: auto; padding-bottom: 25px; scroll-snap-type: x mandatory; }
+        .poll-slider-container::-webkit-scrollbar { height: 8px; }
+        .poll-slider-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .poll-slider-container::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+        .poll-slider-container::-webkit-scrollbar-thumb:hover { background: var(--glow-color); }
+        .poll-card { flex: 0 0 350px; background: var(--primary-card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; backdrop-filter: blur(5px); scroll-snap-align: start; transition: all var(--transition-medium); }
+        .poll-card h3 { font-size: 1.2rem; min-height: 60px; border: none; padding-left: 0; }
+        .poll-options { display: flex; flex-direction: column; gap: 12px; }
+        .poll-options button { width: 100%; padding: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; color: var(--primary-text); font-size: 0.95rem; cursor: pointer; text-align: left; transition: all var(--transition-fast); }
+        .poll-options button:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-color); }
+        .poll-options button:disabled { cursor: not-allowed; opacity: 0.6; }
+
+        /* --- NEW: Poll Answer Feedback Styles --- */
+        .poll-options button.correct-answer {
+            border: 2px solid var(--correct-color);
+            background-color: rgba(34, 197, 94, 0.2);
+            color: #fff; font-weight: 700;
+        }
+        .poll-options button.wrong-answer {
+            border: 2px solid var(--wrong-color);
+            background-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .explanation-box { margin-top: 20px; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 15px; font-size: 0.9rem; line-height: 1.5; max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out; }
+        .explanation-box.visible { max-height: 200px; opacity: 1; }
+
+        /* --- ASTRO-ART GALLERY (UNCHANGED) --- */
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .gallery-item { position: relative; overflow: hidden; border-radius: 12px; cursor: pointer; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform var(--transition-medium); }
+        .gallery-item:hover img { transform: scale(1.1); }
+        .gallery-item .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); color: #fff; display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity var(--transition-medium); font-size: 2rem; }
+        .gallery-item:hover .overlay { opacity: 1; }
+        #upload-btn { display: block; margin: 40px auto 0; padding: 15px 35px; font-size: 1.1rem; font-weight: 700; color: #fff; background-color: transparent; border: 2px solid var(--accent-color); border-radius: 10px; cursor: pointer; transition: all var(--transition-fast); }
+        #upload-btn:hover { background-color: var(--accent-color); box-shadow: 0 0 20px var(--accent-color); }
+
+        /* --- UPCOMING EVENTS & MODAL (UNCHANGED) --- */
+        .events-slider-wrapper { position: relative; }
+        .events-slider-container { overflow: hidden; }
+        .events-slider { display: flex; gap: 25px; scroll-snap-type: x mandatory; overflow-x: scroll; padding-bottom: 20px; scrollbar-width: none; }
+        .events-slider::-webkit-scrollbar { display: none; }
+        .event-card { flex: 0 0 320px; scroll-snap-align: start; background: var(--primary-card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+        .event-card img { width: 100%; height: 180px; object-fit: cover; }
+        .event-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .event-info h4 { font-size: 1.3rem; margin-bottom: 10px; color: #fff; }
+        .event-info p { font-size: 0.9rem; color: #ccc; margin-bottom: 20px; flex-grow: 1; }
+        .notify-btn { width: 100%; padding: 10px; background-color: transparent; border: 1px solid var(--accent-color); color: var(--accent-color); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); }
+        .notify-btn:hover { background-color: var(--accent-color); color: #fff; }
+        .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-color); color: #fff; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; z-index: 10; transition: all var(--transition-fast); }
+        .slider-arrow:hover { background-color: var(--accent-color); }
+        #prev-event { left: -25px; }
+        #next-event { right: -25px; }
+        #notification-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center; }
+        .modal-content { background: var(--dark-bg); padding: 40px; border-radius: 15px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; text-align: center; position: relative; box-shadow: 0 0 30px var(--glow-color); }
+        .modal-content h3 { margin-bottom: 20px; border: none; padding: 0; }
+        #modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #aaa; font-size: 1.5rem; cursor: pointer; transition: color var(--transition-fast), transform var(--transition-fast); }
+        #modal-close:hover { color: #fff; transform: rotate(90deg); }
+        #email-input { width: 100%; padding: 12px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; font-size: 1rem; margin-bottom: 20px; }
+        #submit-notification { width: 100%; padding: 12px; background-color: var(--accent-color); border: none; color: #fff; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        #submit-notification:disabled { background-color: #555; cursor: not-allowed; }
+
+        /* --- USEFUL RESOURCES (UNCHANGED) --- */
+        .resources-container { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+        .resource-list { display: flex; flex-direction: column; gap: 20px; }
+        .resource-item { display: flex; align-items: center; gap: 20px; background-color: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; transition: background-color var(--transition-fast), transform var(--transition-fast); }
+        .resource-item:hover { background-color: rgba(255,255,255,0.07); transform: translateX(10px); }
+        .resource-item img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .resource-item a { color: var(--primary-text); text-decoration: none; font-size: 1.1rem; font-weight: 600; transition: color var(--transition-fast); }
+        .resource-item a:hover { color: var(--accent-color); }
+
+        /* --- FOOTER (UNCHANGED) --- */
+        footer { position: relative; z-index: 5; background: #050505; padding: 80px 40px 20px 40px; border-top: 4px solid var(--accent-color); color: #999; }
+        .footer-container { max-width: 1300px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: 2fr repeat(4, 1fr); gap: 50px; margin-bottom: 60px; }
+        .footer-col .logo-footer { height: 50px; margin-bottom: 20px; }
+        .footer-col p { line-height: 1.7; max-width: 300px; }
+        .footer-col h4 { font-size: 1.1rem; margin-bottom: 25px; color: var(--primary-text); font-weight: 700; letter-spacing: 0.05em; }
+        .footer-col ul { list-style: none; padding: 0; }
+        .footer-col ul li { margin-bottom: 15px; }
+        .footer-col a { text-decoration: none; color: #999; transition: color var(--transition-fast); }
+        .footer-col a:hover { color: var(--accent-color); }
+        .social-icons { display: flex; gap: 15px; }
+        .social-icons a { font-size: 1.2rem; color: #999; background-color: #222; width: 40px; height: 40px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; transition: background-color var(--transition-fast), color var(--transition-fast); }
+        .social-icons a:hover { background-color: var(--accent-color); color: #000; }
+        .newsletter-form { display: flex; margin-top: 10px; max-width: 250px; }
+        .newsletter-form input { flex-grow: 1; padding: 12px; border: 1px solid #444; background: #222; color: var(--primary-text); border-radius: 5px 0 0 5px; outline: none; }
+        .newsletter-form button { padding: 12px 20px; border: 1px solid var(--accent-color); background: var(--accent-color); color: var(--dark-bg); cursor: pointer; font-weight: 700; border-radius: 0 5px 5px 0; transition: background var(--transition-fast), color var(--transition-fast); }
+        .newsletter-form button:hover { background: #ffedaa; }
+        .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid #333; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .footer-bottom-links a { color: #999; text-decoration: none; margin-left: 20px; transition: color var(--transition-fast); }
+        .footer-bottom-links a:hover { color: var(--accent-color); }
+
+
+
+
+        /* Widget CSS */
+    #astro-fab {
+        position: fixed; bottom: 30px; right: 30px; width: 120px; height: 120px;
+        background: #ffd860; color: #000; border: none; border-radius: 50%;
+        font-size: 40px; cursor: pointer; box-shadow: 0 0 20px rgba(255, 216, 96, 0.4);
+        z-index: 9999; transition: transform 0.3s;
+    }
+    #astro-fab:hover { transform: scale(1.1); }
+
+    #astro-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+    }
+    .astro-panel {
+        background: rgba(20, 20, 30, 0.95); border: 2px solid #ffd860; padding: 80px;
+        border-radius: 20px; text-align: center; position: relative; width: 600px;
+        box-shadow: 0 0 50px rgba(255, 216, 96, 0.2);
+    }
+    .astro-panel h2 { color: #fff; margin-bottom: 5px; font-family: sans-serif; }
+    .astro-panel p { color: #ccc; margin-bottom: 30px; font-family: sans-serif; }
+    
+    .widget-mic {
+        width: 100px; height: 100px; margin: 0 auto; background: rgba(255,216,96,0.1);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        border: 2px solid #ffd860; cursor: pointer; position: relative; font-size: 2rem; color: #ffd860;
+    }
+    .widget-mic.listening { box-shadow: 0 0 40px #ffd860; background: #ffd860; color: #000; }
+    
+    .w-vision-btn {
+        width: 100%; padding: 12px; margin-top: 20px; background: transparent;
+        border: 1px solid #ffd860; color: #ffd860; border-radius: 8px; cursor: pointer;
+        font-weight: 700; transition: 0.3s;
+    }
+    .w-vision-btn.active { background: #ffd860; color: #000; }
+    
+    .w-hud { margin-top: 20px; display: flex; justify-content: space-between; font-size: 0.9rem; color: #fff; }
+    .close-widget { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+    
+    #w-camera-preview {
+        position: absolute; top: 20px; right: 20px; width: 120px; border-radius: 10px;
+        border: 2px solid #ffd860; display: none; transform: scaleX(-1);
+    }
+
+
+
+
+
+        /* --- RESPONSIVENESS (UNCHANGED) --- */
+        @media (max-width: 1200px) { .navbar-menu { display: none; } }
+        @media (max-width: 992px) { h2 { font-size: 2.2rem; } .main-heading { font-size: 3rem; } #community-feed, .resources-container { grid-template-columns: 1fr; } .create-post { position: static; margin-bottom: 40px; } }
+        @media (max-width: 768px) { section { padding: 60px 3%; } .slider-arrow { width: 40px; height: 40px; font-size: 1.2rem; } #prev-event { left: 10px; } #next-event { right: 10px; } .main-heading { font-size: 2.5rem; } .footer-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 576px) { .footer-grid { grid-template-columns: 1fr; } }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="homepage.html" class="navbar-logo">
+            <img src="mylogo.png" alt="Starlight Hub Logo"> </a>
+        <div class="navbar-menu">
+            <a href="homepage.html">HOME</a>
+            <a href="#community-feed">COMMUNITY</a>
+            <a href="#poll-section">POLLS</a>
+            <a href="#astro-gallery">GALLERY</a>
+            <a href="#events-section">EVENTS</a>
+            <a href="#resources-section">RESOURCES</a>
+        </div>
+        
+    </nav>
+    <div id="astro-widget-container">
+    <button id="astro-fab" onclick="window.AstroWidget.toggle()">
+        <i class="fa-solid fa-eye"></i>
+    </button>
+
+    <div id="astro-overlay">
+        <div class="astro-panel">
+            <button class="close-widget" onclick="window.AstroWidget.toggle()">&times;</button>
+            <h2>ASTRO-BRIEF AI</h2>
+            <p>Your Co-Pilot is Ready.</p>
+            
+            <div class="widget-mic" onmousedown="window.AstroWidget.startListening()" onmouseup="window.AstroWidget.stopListening()">
+                <div class="w-mic-ring"></div>
+                <i class="fa-solid fa-microphone"></i>
+            </div>
+            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Hold Spacebar or Click</p>
+
+            <button class="w-vision-btn" id="w-vision-btn" onclick="window.AstroWidget.toggleCamera()">
+                <i class="fa-solid fa-camera"></i> Vision
+            </button>
+
+            <div class="w-hud">
+                <span id="w-status">Ready</span>
+                <span id="w-latency" style="color:#0f0; font-family:monospace;">0.0s</span>
+            </div>
+        </div>
+        <video id="w-camera-preview" autoplay playsinline></video>
+        <canvas id="w-snapshot-canvas" style="display:none;"></canvas>
+    </div>
+</div>
+    <main>
+        <h1 class="main-heading">Welcome to THE COMMUNITY</h1>
+
+        <section id="community-feed">
+            <div class="create-post">
+                <h3>Join the Conversation</h3>
+                <textarea id="post-textarea" placeholder="What's on your mind, stargazer?"></textarea>
+                <button id="create-post-btn">Post</button>
+            </div>
+            <div class="posts-container">
+                <div class="post-filters">
+                    <button class="filter-btn active" data-filter="trending">Trending Posts</button>
+                    <button class="filter-btn" data-filter="my-posts">My Posts</button>
+                </div>
+                <div class="posts-list">
+                    <article class="post-card" data-post-type="trending">
+                        <div class="post-header">
+                            <img src="https://picsum.photos/seed/user1/50/50" alt="User Avatar">
+                            <div>
+                                <div class="post-user">@AstroExplorer</div>
+                                <div class="post-timestamp">5m ago</div>
+                            </div>
+                        </div>
+                        <p class="post-content">Just saw the James Webb Telescope's latest image of the Pillars of Creation. Absolutely breathtaking! The level of detail is just unreal. It really puts into perspective how vast and beautiful our universe is. 🤯 #JWST #Space</p>
+                        <div class="post-actions">
+                            <button class="like-btn"><i class="fa-solid fa-heart"></i> <span class="like-count">1</span> Likes</button>
+                            <button class="comment-btn"><i class="fa-solid fa-comment"></i> 34 Comments</button>
+                            <button class="share-btn"><i class="fa-solid fa-share"></i> Share</button>
+                        </div>
+                    </article>
+                    <article class="post-card" data-post-type="trending">
+                        <div class="post-header">
+                            <img src="https://picsum.photos/seed/user2/50/50" alt="User Avatar">
+                            <div>
+                                <div class="post-user">@CosmicClara</div>
+                                <div class="post-timestamp">2h ago</div>
+                            </div>
+                        </div>
+                        <p class="post-content">Does anyone have recommendations for a good beginner-level telescope for backyard stargazing? Looking for something under $500 that's good for viewing planets and maybe some brighter nebulae. Any advice is appreciated!</p>
+                        <div class="post-actions">
+                            <button class="like-btn"><i class="fa-solid fa-heart"></i> <span class="like-count">98</span> Likes</button>
+                            <button class="comment-btn"><i class="fa-solid fa-comment"></i> 15 Comments</button>
+                            <button class="share-btn"><i class="fa-solid fa-share"></i> Share</button>
+                        </div>
+                    </article>
+                    <article class="post-card" data-post-type="trending">
+                        <div class="post-header">
+                            <img src="https://picsum.photos/seed/user3/50/50" alt="User Avatar">
+                            <div>
+                                <div class="post-user">@RocketManRon</div>
+                                <div class="post-timestamp">1d ago</div>
+                            </div>
+                        </div>
+                        <p class="post-content">Super excited for the upcoming Artemis II mission! Seeing humans orbit the Moon again is going to be a historic moment. Who else is planning to watch the launch live?</p>
+                        <div class="post-actions">
+                            <button class="like-btn"><i class="fa-solid fa-heart"></i> <span class="like-count">756</span> Likes</button>
+                            <button class="comment-btn"><i class="fa-solid fa-comment"></i> 112 Comments</button>
+                            <button class="share-btn"><i class="fa-solid fa-share"></i> Share</button>
+                        </div>
+                    </article>
+                    </div>
+            </div>
+        </section>
+
+        <section id="poll-section">
+            <h2>Community Polls</h2>
+            <div class="poll-slider-container">
+                <div class="poll-card" data-correct-answer="Europa Clipper (Jupiter's Moon)">
+                    <h3>Which mission is to investigate the possiblity of subsurface ocean?</h3>
+                    <div class="poll-options">
+                        <button>Artemis II (Moon Orbit)</button>
+                        <button>Europa Clipper (Jupiter's Moon)</button>
+                        <button>Mars Sample Return</button>
+                        <button>Dragonfly (Titan Drone)</button>
+                    </div>
+                    <div class="explanation-box">
+                        <p><strong>Europa Clipper:</strong> This mission will investigate Jupiter's moon Europa, a prime candidate for life beyond Earth due to its suspected subsurface ocean.</p>
+                    </div>
+                </div>
+                <div class="poll-card" data-correct-answer="The rings of Saturn">
+                    <h3>What are made of dead debris of moon?</h3>
+                    <div class="poll-options">
+                        <button>Mars</button>
+                        <button>The rings of Saturn</button>
+                        <button>A Kuiper Belt object</button>
+                        <button>The cloud tops of Jupiter</button>
+                    </div>
+                    <div class="explanation-box">
+                        <p><strong>The rings of Saturn:</strong> Composed of countless particles of ice and rock, Saturn's rings are one of the most visually stunning phenomena in our solar system.</p>
+                    </div>
+                </div>
+                <div class="poll-card" data-correct-answer="Gravitational Waves">
+                    <h3>What allows us to observe blak holes?</h3>
+                    <div class="poll-options">
+                        <button>Exoplanets</button>
+                        <button>Dark Energy</button>
+                        <button>Gravitational Waves</button>
+                        <button>The Cosmic Microwave Background</button>
+                    </div>
+                    <div class="explanation-box">
+                        <p><strong>Gravitational Waves:</strong> First predicted by Einstein, these ripples in spacetime allow us to observe cosmic events like black hole mergers in a completely new way.</p>
+                    </div>
+                </div>
+                </div>
+        </section>
+
+        <section id="astro-gallery">
+            <h2>Astro-Art Gallery</h2>
+            <div class="image-grid">
+                <div class="gallery-item"><img src="z.png" alt="Astrophotography image"><div class="overlay"><i class="fas fa-search-plus"></i></div></div>
+                <div class="gallery-item"><img src="c.png" alt="Astrophotography image"><div class="overlay"><i class="fas fa-search-plus"></i></div></div>
+                <div class="gallery-item"><img src="a.png" alt="Astrophotography image"><div class="overlay"><i class="fas fa-search-plus"></i></div></div>
+                <div class="gallery-item"><img src="n.png" alt="Astrophotography image"><div class="overlay"><i class="fas fa-search-plus"></i></div></div>
+                <div class="gallery-item"><img src="t.png" alt="Astrophotography image"><div class="overlay"><i class="fas fa-search-plus"></i></div></div>
+                <div class="gallery-item"><img src="l.png" alt="Astrophotography image"><div class="overlay"><i class="fas fa-search-plus"></i></div></div>
+            </div>
+            <button id="upload-btn">Upload Your Image</button>
+        </section>
+        <section id="events-section">
+            <h2>Upcoming Events</h2>
+            <div class="events-slider-wrapper">
+                <div class="events-slider-container">
+                    <div class="events-slider">
+                        <div class="event-card">
+                            <img src="ms.png" alt="Event Banner">
+                            <div class="event-info">
+                                <h4>Perseid Meteor Shower Peak</h4>
+                                <p>August 12-13, 2026 - Watch one of the best meteor showers of the year from a dark sky location.</p>
+                                <button class="notify-btn">Notify Me</button>
+                            </div>
+                        </div>
+                        <div class="event-card">
+                            <img src="bh.png" alt="Event Banner">
+                            <div class="event-info">
+                                <h4>Webinar: Black Holes Explained</h4>
+                                <p>October 5, 2025 - Join Dr. Eva Rostova for a deep dive into the mysteries of black holes.</p>
+                                <button class="notify-btn">Notify Me</button>
+                            </div>
+                        </div>
+                        <div class="event-card">
+                            <img src="se.png" alt="Event Banner">
+                            <div class="event-info">
+                                <h4>Total Solar Eclipse (Spain)</h4>
+                                <p>August 12, 2026 - A rare opportunity to witness a total solar eclipse over parts of Europe.</p>
+                                <button class="notify-btn">Notify Me</button>
+                            </div>
+                        </div>
+                        <div class="event-card">
+                            <img src="sp.png" alt="Event Banner">
+                            <div class="event-info">
+                                <h4>Community Star Party</h4>
+                                <p>November 1, 2025 - Local meetup for stargazing. Telescopes will be provided!</p>
+                                <button class="notify-btn">Notify Me</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="slider-arrow" id="prev-event">&#10094;</button>
+                <button class="slider-arrow" id="next-event">&#10095;</button>
+            </div>
+        </section>
+        <div id="notification-modal">
+            <div class="modal-content">
+                <button id="modal-close">&times;</button>
+                <h3>Get Notified!</h3>
+                <p>Enter your email to get a reminder for this event.</p>
+                <input type="email" id="email-input" placeholder="youremail@example.com">
+                <button id="submit-notification" disabled>Submit</button>
+            </div>
+        </div>
+        <section id="resources-section">
+            <h2>Expand Your Universe</h2>
+            <div class="resources-container">
+                <div class="youtube-channels">
+                    <h3>YouTube Channels</h3>
+                    <div class="resource-list">
+                        <div class="resource-item"><img src="nasa.png" alt="NASA Logo"><a href="https://www.youtube.com/c/NASA" target="_blank">NASA</a></div>
+                        <div class="resource-item"><img src="veri.png" alt="Veritasium Logo"><a href="https://www.youtube.com/c/veritasium" target="_blank">Veritasium</a></div>
+                        <div class="resource-item"><img src="pbsyt.jpg" alt="PBS Space Time Logo"><a href="https://www.youtube.com/c/pbsspacetime" target="_blank">PBS Space Time</a></div>
+                    </div>
+                </div>
+                <div class="websites">
+                    <h3>Websites</h3>
+                    <div class="resource-list">
+                        <div class="resource-item"><img src="isro.png" alt="APOD Logo"><a href="https://www.isro.gov.in/" target="_blank">ISRO</a></div>
+                        <div class="resource-item"><img src="spacex.png" alt="Space.com Logo"><a href="https://www.space.com/" target="_blank">Space.com</a></div>
+                        <div class="resource-item"><img src="esa.png" alt="ESA Logo"><a href="https://www.esa.int/" target="_blank">European Space Agency (ESA)</a></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="mylogo.png" alt="StellerAtlas Logo" class="logo-footer" />
+                    <p>Your one-stop platform for all things space, astrophysics, and astronomy. Explore the cosmos with us.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="missions.html">Missions</a></li>
+                        <li><a href="solar-system.html">Solar System</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="news.html">News</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="blogs.html">Blogs</a></li>
+                        <li><a href="astronomy.html">Astronomy 101</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                        <li><a href="glossary.html">Glossary</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>About</h4>
+                    <ul>
+                        <li><a href="about.html">About StellerAtlas</a></li>
+                        <li><a href="team.html">Our Team</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="community.html">Community</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Connect</h4>
+                    <div class="social-icons">
+                        <a href="#" aria-label="X formerly Twitter"><img src="x.png" alt="X" /></a>
+                        <a href="#" aria-label="Instagram"><img src="insta.png" alt="Instagram" /></a>
+                        <a href="#" aria-label="YouTube"><img src="yt.png" alt="YouTube" /></a>
+                        <a href="#" aria-label="Facebook"><img src="fb.png" alt="Facebook" /></a>
+                    </div>
+                    <h4 style="margin-top: 30px">Newsletter</h4>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="your.email@example.com" required />
+                        <button type="submit">SUB</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CosmicEcho. All Rights Reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="terms.html">Terms of Service</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const submitBtn = document.getElementById('submit-notification');
+const emailInput = document.getElementById('email-input');
+const modal = document.getElementById('notification-modal');
+
+submitBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  const email = emailInput.value.trim();
+  if (!email) {
+    alert('Please enter an email address.');
+    return;
+  }
+
+  fetch('http://127.0.0.1:5000/send-calendar-event',{  // Change URL if needed
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email })
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert(data.message || 'Event notification sent!');
+    emailInput.value = '';
+    submitBtn.disabled = true;
+    if (modal) modal.style.display = 'none';  // Close modal
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Failed to send notification. Please try again.');
+  });
+});
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- NAVIGATION BAR COUNTDOWN ---
+            // Unchanged from original, kept for functionality.
+            function startCountdown(seconds) {
+                let timer = seconds;
+                const timerEl = document.getElementById('timer');
+                if (!timerEl) return;
+                const interval = setInterval(() => {
+                    let h = Math.floor(timer / 3600);
+                    let m = Math.floor((timer % 3600) / 60);
+                    let s = timer % 60;
+                    timerEl.textContent = `T-${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    if (timer > 0) {
+                        timer--;
+                    } else {
+                        clearInterval(interval);
+                        timerEl.textContent = 'LIFTOFF!';
+                    }
+                }, 1000);
+            }
+            const launchTime = new Date('2025-10-14T11:53:00+05:30').getTime();
+            const now = new Date().getTime();
+            const duration = Math.floor((launchTime - now) / 1000);
+            startCountdown(duration > 0 ? duration : 0);
+
+            // --- NEW: COMMUNITY POST FUNCTIONALITY ---
+            const createPostBtn = document.getElementById('create-post-btn');
+            const postTextarea = document.getElementById('post-textarea');
+            const postsList = document.querySelector('.posts-list');
+            const postFilters = document.querySelector('.post-filters');
+
+            // Function to create a new post card element
+            const createPostElement = (content) => {
+                const article = document.createElement('article');
+                article.className = 'post-card';
+                article.dataset.postType = 'my-posts'; // Assign a type for filtering
+                article.style.display = 'none'; // Initially hidden
+
+                // Using a template literal for clean HTML structure
+                article.innerHTML = `
+                    <div class="post-header">
+                        <img src="https://picsum.photos/seed/currentUser/50/50" alt="User Avatar">
+                        <div>
+                            <div class="post-user">@Stargazer</div>
+                            <div class="post-timestamp">Just now</div>
+                        </div>
+                    </div>
+                    <p class="post-content">${content}</p>
+                    <div class="post-actions">
+                        <button class="like-btn"><i class="fa-solid fa-heart"></i> <span class="like-count">0</span> Likes</button>
+                        <button class="comment-btn"><i class="fa-solid fa-comment"></i> 0 Comments</button>
+                        <button class="share-btn"><i class="fa-solid fa-share"></i> Share</button>
+                    </div>
+                `;
+                postsList.prepend(article);
+                return article;
+            };
+
+            // Event listener for the main "Post" button
+            createPostBtn.addEventListener('click', () => {
+                const content = postTextarea.value.trim();
+                if (content) {
+                    createPostElement(content);
+                    postTextarea.value = '';
+                    // Automatically switch to "My Posts" view to show the new post
+                    postFilters.querySelector('[data-filter="my-posts"]').click();
+                }
+            });
+
+            // Event listener for the filter buttons ("Trending" and "My Posts")
+            postFilters.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    const filter = e.target.dataset.filter;
+
+                    // Update active state on buttons
+                    postFilters.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    // Show/hide posts based on the selected filter
+                    postsList.querySelectorAll('.post-card').forEach(post => {
+                        if (post.dataset.postType === filter) {
+                            post.style.display = 'block';
+                        } else {
+                            post.style.display = 'none';
+                        }
+                    });
+                }
+            });
+
+            // --- NEW: POST INTERACTIONS (LIKE, COMMENT, SHARE) ---
+            // Using event delegation on the posts list for dynamically added posts
+            postsList.addEventListener('click', (e) => {
+                const target = e.target;
+
+                // Like Button Logic
+                if (target.closest('.like-btn')) {
+                    const likeBtn = target.closest('.like-btn');
+                    likeBtn.classList.toggle('liked');
+                    
+                    const likeCountEl = likeBtn.querySelector('.like-count');
+                    let count = parseInt(likeCountEl.textContent);
+
+                    if (likeBtn.classList.contains('liked')) {
+                        count++;
+                    } else {
+                        count--;
+                    }
+                    likeCountEl.textContent = count; // Simplified count for demo
+                }
+
+                // Comment Button Logic
+                if (target.closest('.comment-btn')) {
+                    const postCard = target.closest('.post-card');
+                    let commentSection = postCard.querySelector('.comment-section');
+                    
+                    // Create comment section if it doesn't exist
+                    if (!commentSection) {
+                        commentSection = document.createElement('div');
+                        commentSection.className = 'comment-section';
+                        commentSection.innerHTML = `
+                            <div class="comments-display"></div>
+                            <form class="comment-form">
+                                <input type="text" placeholder="Add a comment..." required>
+                                <button type="submit">Post</button>
+                            </form>
+                        `;
+                        postCard.appendChild(commentSection);
+
+                        // Add form submit listener
+                        commentSection.querySelector('.comment-form').addEventListener('submit', (event) => {
+                            event.preventDefault();
+                            const input = event.target.querySelector('input');
+                            const commentText = input.value.trim();
+                            if (commentText) {
+                                const newComment = document.createElement('div');
+                                newComment.className = 'comment';
+                                newComment.innerHTML = `<strong>@Stargazer:</strong> ${commentText}`;
+                                commentSection.querySelector('.comments-display').prepend(newComment);
+                                input.value = '';
+                            }
+                        });
+                    }
+
+                    // Toggle visibility with smooth animation
+                    setTimeout(() => commentSection.classList.toggle('visible'), 0);
+                }
+                
+                // Share Button Logic
+                if (target.closest('.share-btn')) {
+                    const shareBtn = target.closest('.share-btn');
+                    const postCard = shareBtn.closest('.post-card');
+                    let shareMenu = postCard.querySelector('.share-menu');
+
+                    // Create share menu if it doesn't exist
+                    if (!shareMenu) {
+                        shareMenu = document.createElement('div');
+                        shareMenu.className = 'share-menu';
+                        const postContent = postCard.querySelector('.post-content').textContent.substring(0, 100);
+                        const encodedContent = encodeURIComponent(`Check out this post on StellerAtlas: "${postContent}..."`);
+                        shareMenu.innerHTML = `
+                            <a href="https://twitter.com/intent/tweet?text=${encodedContent}" target="_blank" title="Share on X"><i class="fa-brands fa-xing"></i></a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=${window.location.href}" target="_blank" title="Share on Facebook"><i class="fa-brands fa-facebook"></i></a>
+                            <a href="https://api.whatsapp.com/send?text=${encodedContent}" target="_blank" title="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                            <a href="https://www.instagram.com" target="_blank" title="Share on Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        `;
+                        shareBtn.parentElement.appendChild(shareMenu); // Append to post-actions
+                    }
+                    
+                    // Toggle visibility
+                    shareMenu.classList.toggle('visible');
+                }
+            });
+
+
+            // --- ENHANCED: INTERACTIVE POLL SLIDER ---
+            const pollSlider = document.querySelector('.poll-slider-container');
+            if (pollSlider) {
+                pollSlider.addEventListener('click', (e) => {
+                    const button = e.target;
+                    // Check if a poll option button was clicked
+                    if (button.tagName === 'BUTTON' && button.parentElement.classList.contains('poll-options')) {
+                        const pollCard = button.closest('.poll-card');
+                        if (!pollCard) return;
+
+                        const optionButtons = pollCard.querySelectorAll('.poll-options button');
+                        const explanationBox = pollCard.querySelector('.explanation-box');
+                        const correctAnswer = pollCard.dataset.correctAnswer;
+                        const userAnswer = button.textContent;
+
+                        // Disable all buttons in this poll after one is clicked
+                        optionButtons.forEach(btn => {
+                            btn.disabled = true;
+                            // Highlight the correct answer
+                            if (btn.textContent === correctAnswer) {
+                                btn.classList.add('correct-answer');
+                            }
+                        });
+
+                        // Mark the user's choice as correct or wrong
+                        if (userAnswer === correctAnswer) {
+                            button.classList.add('correct-answer');
+                        } else {
+                            button.classList.add('wrong-answer');
+                        }
+                        
+                        // Show the explanation box
+                        explanationBox.classList.add('visible');
+                    }
+                });
+            }
+
+            // --- ASTRO-ART GALLERY (UNCHANGED) ---
+            const uploadBtn = document.getElementById('upload-btn');
+            if (uploadBtn) {
+                uploadBtn.addEventListener('click', () => {
+                    alert('Image upload functionality coming soon!');
+                });
+            }
+
+            // --- UPCOMING EVENTS SLIDER & MODAL (UNCHANGED) ---
+            const prevBtn = document.getElementById('prev-event');
+            const nextBtn = document.getElementById('next-event');
+            const eventsSlider = document.querySelector('.events-slider');
+            if (prevBtn && nextBtn && eventsSlider) {
+                const scrollAmount = 345;
+                nextBtn.addEventListener('click', () => eventsSlider.scrollBy({ left: scrollAmount, behavior: 'smooth' }));
+                prevBtn.addEventListener('click', () => eventsSlider.scrollBy({ left: -scrollAmount, behavior: 'smooth' }));
+            }
+            const modal = document.getElementById('notification-modal');
+            if (modal) {
+                const closeModalBtn = document.getElementById('modal-close');
+                const emailInput = document.getElementById('email-input');
+                const submitBtn = document.getElementById('submit-notification');
+                const notifyBtns = document.querySelectorAll('.notify-btn');
+                notifyBtns.forEach(btn => btn.addEventListener('click', () => modal.style.display = 'flex'));
+                closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+                modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+                emailInput.addEventListener('input', () => {
+                    const emailRegex = /^\S+@\S+\.\S+$/;
+                    submitBtn.disabled = !emailRegex.test(emailInput.value);
+                });
+            }
+        });
+
+    window.AstroWidget = (function() {
+        let w_mediaRecorder = null;
+        let w_chunks = [];
+        let w_cameraOn = false;
+        let w_ctx = null; 
+        let w_isOpen = false; // Track if widget is open
+
+        function initAudio() {
+            if (!w_ctx) w_ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (w_ctx.state === 'suspended') w_ctx.resume();
+        }
+
+        function toggle() {
+            const overlay = document.getElementById('astro-overlay');
+            w_isOpen = (overlay.style.display === 'flex');
+            
+            if (w_isOpen) {
+                overlay.style.display = 'none';
+                w_isOpen = false;
+            } else {
+                overlay.style.display = 'flex';
+                w_isOpen = true;
+                initAudio();
+            }
+        }
+
+        // --- SPACEBAR LISTENER FOR WIDGET ---
+        document.addEventListener('keydown', (e) => {
+            // Only activate if widget is OPEN and space is pressed
+            if (w_isOpen && e.code === 'Space' && !e.repeat) {
+                startListening();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (w_isOpen && e.code === 'Space') {
+                stopListening();
+            }
+        });
+        // -------------------------------------
+
+        async function toggleCamera() {
+            const video = document.getElementById('w-camera-preview');
+            const btn = document.getElementById('w-vision-btn');
+            if (!w_cameraOn) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                    video.srcObject = stream; video.style.display = 'block';
+                    w_cameraOn = true; btn.classList.add('active');
+                } catch(e) { alert("Camera Permission Denied"); }
+            } else {
+                if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                video.style.display = 'none'; w_cameraOn = false; btn.classList.remove('active');
+            }
+        }
+
+        async function startListening() {
+            initAudio();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                w_mediaRecorder = new MediaRecorder(stream);
+                w_chunks = [];
+                w_mediaRecorder.ondataavailable = e => w_chunks.push(e.data);
+                w_mediaRecorder.onstop = sendData;
+                w_mediaRecorder.start();
+                
+                document.querySelector('.widget-mic').classList.add('listening');
+                document.getElementById('w-status').innerText = "Listening...";
+                playTone(400);
+            } catch(e) { 
+                alert("Microphone Needed."); 
+            }
+        }
+
+        function stopListening() {
+            if(w_mediaRecorder && w_mediaRecorder.state !== 'inactive') w_mediaRecorder.stop();
+            document.querySelector('.widget-mic').classList.remove('listening');
+            document.getElementById('w-status').innerText = "Thinking...";
+            playTone(300);
+        }
+
+        async function sendData() {
+            const blob = new Blob(w_chunks, {type: 'audio/wav'});
+            const formData = new FormData();
+            formData.append("audio_data", blob, "voice.wav");
+
+            if(w_cameraOn) {
+                const vid = document.getElementById('w-camera-preview');
+                const can = document.getElementById('w-snapshot-canvas');
+                can.width = vid.videoWidth; can.height = vid.videoHeight;
+                can.getContext('2d').drawImage(vid, 0, 0);
+                const imgBlob = await new Promise(r => can.toBlob(r, 'image/jpeg'));
+                formData.append("image_data", imgBlob, "frame.jpg");
+            }
+
+            let start = Date.now();
+            fetch('/process_audio', {method: 'POST', body: formData})
+            .then(r => r.json())
+            .then(d => {
+                let lat = (Date.now() - start)/1000;
+                document.getElementById('w-latency').innerText = lat.toFixed(2) + 's';
+                document.getElementById('w-status').innerText = "Speaking...";
+                
+                if(d.sonification_data?.length > 0) {
+                    playMusic(d.sonification_data, () => { if(d.audio_base64) playAudio(d.audio_base64); });
+                } else if(d.audio_base64) {
+                    playAudio(d.audio_base64);
+                }
+            })
+            .catch(e => { console.error(e); document.getElementById('w-status').innerText = "Offline?"; });
+        }
+
+        function playTone(f) {
+            if(!w_ctx) return;
+            const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+            o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(w_ctx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.1); o.stop(w_ctx.currentTime+0.1);
+        }
+        function playMusic(d, cb) {
+            let i=0; let iv = setInterval(() => {
+                if(i>=d.length) { clearInterval(iv); cb(); return; }
+                const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+                o.type='triangle'; o.frequency.value=200+(d[i]*6); o.connect(g); g.connect(w_ctx.destination);
+                o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.15); o.stop(w_ctx.currentTime+0.15);
+                i++;
+            }, 120);
+        }
+        function playAudio(b64) {
+            new Audio("data:audio/mp3;base64,"+b64).play();
+        }
+
+        return { toggle, toggleCamera, startListening, stopListening };
+    })();
+    </script> 
+</body>
+</html>

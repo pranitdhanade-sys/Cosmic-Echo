@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blogs - StellerAtlas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    /* --- GLOBAL STYLES & VARIABLES --- */
+    :root {
+      --primary-color: #ffffff;
+      --accent-color: #ffd860;
+      --dark-bg: #000000;
+      --semi-dark-bg: rgba(10, 10, 10, 0.7);
+      --font-primary: 'Montserrat', Arial, sans-serif;
+      --transition-fast: 0.3s ease;
+      --transition-med: 0.5s ease;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
+
+    body { 
+      margin: 0; padding: 0; height: 100%;
+      font-family: var(--font-primary);
+      background: var(--dark-bg);
+      color: var(--primary-color);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* --- BACKGROUND ELEMENTS --- */
+    canvas#star-field {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: -1; pointer-events: none;
+    }
+   /* Navigation Bar */
+        nav.navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 40px;
+        }
+
+        .navbar-logo img {
+            height: 80px;
+            width: auto;
+            transition: transform var(--transition-fast), filter var(--transition-fast);
+        }
+
+        .navbar-logo img:hover {
+            transform: scale(1.08);
+            filter: drop-shadow(0 0 8px var(--accent-color));
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar-menu a {
+            color: #ececec;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.04rem;
+            letter-spacing: 0.03em;
+            padding: 8px 15px;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .navbar-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform var(--transition-fast);
+        }
+
+        .navbar-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar-menu a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.active {
+            color: var(--accent-color);
+        }
+
+        .navbar-menu a.active::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.login-btn {
+            background: var(--accent-color);
+            color: var(--dark-bg);
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .navbar-menu a.login-btn:hover {
+            background: #ffed4e;
+            color: var(--dark-bg);
+        }
+
+        .navbar-menu a.login-btn::after {
+            display: none;
+        }
+    /* --- BLOG PAGE STYLES --- */
+    main {
+        padding-top: 140px; padding-bottom: 100px;
+    }
+    .filter-controls {
+        display: flex; justify-content: center; gap: 15px;
+        margin: 0 auto 50px; flex-wrap: wrap; padding: 0 20px;
+    }
+    .filter-controls button {
+        font-family: var(--font-primary); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em;
+        color: var(--primary-color); background: transparent; border: 2px solid var(--primary-color);
+        border-radius: 8px; padding: 10px 25px; cursor: pointer; transition: all var(--transition-fast);
+    }
+    .filter-controls button:hover { border-color: var(--accent-color); color: var(--accent-color); }
+    .filter-controls button.active { background: var(--accent-color); color: var(--dark-bg); border-color: var(--accent-color); }
+    .article-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 40px; max-width: 1400px; margin: 0 auto; padding: 0 40px;
+    }
+    .article-card-link { text-decoration: none; color: inherit; transition: all var(--transition-med); }
+    .article-card {
+        background: rgba(10, 15, 25, 0.65); border: 3px solid rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        display: flex; flex-direction: column; height: 100%;
+        --rotate-x: 0; --rotate-y: 0; transform-style: preserve-3d;
+        transform: perspective(1000px) rotateY(var(--rotate-y)) rotateX(var(--rotate-x));
+        transition: transform 0.1s linear, box-shadow var(--transition-fast), opacity var(--transition-med);
+        opacity: 0; transform: translateY(30px);
+    }
+    .article-card.visible {
+        opacity: 1; transform: translateY(0) perspective(1000px) rotateY(var(--rotate-y)) rotateX(var(--rotate-x));
+    }
+    .article-card-link.hidden {
+      transform: scale(0.9); opacity: 0; pointer-events: none;
+      width: 0; height: 0; padding: 0; margin: 0; overflow: hidden;
+    }
+    .article-card:hover { box-shadow: 0 0 25px 5px rgba(255, 216, 96, 0.4); }
+    .article-card .thumbnail { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }
+    .card-header { position: relative; margin-bottom: 15px; }
+    .article-card h3 { font-size: 1.4rem; line-height: 1.4; margin: 0; }
+    .source-logo {
+        position: absolute; top: -40px; right: 0px; width: 50px; height: 50px;
+        background: rgba(0,0,0,0.7); border-radius: 50%; padding: 5px; object-fit: contain;
+    }
+    .card-footer {
+        margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 0.9rem; color: #ccc;
+    }
+    .card-footer .tags { font-weight: 600; color: var(--accent-color); }
+
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      nav.navbar { justify-content: space-evenly; flex-wrap: wrap; }
+      .navbar-menu { order: 2; width: 100%; justify-content: center; }
+      .navbar-logo { order: 1; }
+      .navbar-special { order: 3; }
+    }
+    @media (max-width: 600px) {
+        .navbar-special { display: none; } /* Hide special button on very small screens */
+    }
+footer {
+  position: relative;
+  z-index: 5;
+  background: #050505;
+  padding: 80px 40px 20px 40px;
+  border-top: 4px solid var(--accent-color);
+  color: #999;
+}
+.footer-container {
+  max-width: 1300px;
+  margin: 0 auto;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, 1fr);
+  gap: 50px;
+  margin-bottom: 60px;
+}
+.footer-col .logo-footer {
+  height: 50px;
+  margin-bottom: 20px;
+}
+.footer-col p {
+  line-height: 1.7;
+  max-width: 300px;
+}
+.footer-col h4 {
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+  color: var(--primary-color);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+}
+.footer-col ul li {
+  margin-bottom: 15px;
+}
+.footer-col a {
+  text-decoration: none;
+  color: #999;
+  transition: color var(--transition-fast);
+}
+.footer-col a:hover {
+  color: var(--accent-color);
+}
+.social-icons {
+  display: flex;
+  gap: 15px;
+}
+.social-icons a {
+  font-size: 1.2rem;
+  color: #999;
+  background-color: #222;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.social-icons a:hover {
+  background-color: var(--accent-color);
+  color: #000;
+}
+.newsletter-form {
+  display: flex;
+  margin-top: 10px;
+  max-width: 250px;
+}
+.newsletter-form input {
+  flex-grow: 1;
+  padding: 12px;
+  border: 1px solid #444;
+  background: #222;
+  color: var(--primary-color);
+  border-radius: 5px 0 0 5px;
+  outline: none;
+}
+.newsletter-form button {
+  padding: 12px 20px;
+  border: 1px solid var(--accent-color);
+  background: var(--accent-color);
+  color: var(--dark-bg);
+  cursor: pointer;
+  font-weight: 700;
+  border-radius: 0 5px 5px 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.newsletter-form button:hover {
+  background: #ffedaa;
+}
+.footer-bottom {
+  text-align: center;
+  padding-top: 30px;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-bottom-links a {
+  color: #999;
+  text-decoration: none;
+  margin-left: 20px;
+  transition: color var(--transition-fast);
+}
+.footer-bottom-links a:hover {
+  color: var(--accent-color);
+}
+
+
+
+/* Widget CSS */
+    #astro-fab {
+        position: fixed; bottom: 30px; right: 30px; width: 120px; height: 120px;
+        background: #ffd860; color: #000; border: none; border-radius: 50%;
+        font-size: 40px; cursor: pointer; box-shadow: 0 0 20px rgba(255, 216, 96, 0.4);
+        z-index: 9999; transition: transform 0.3s;
+    }
+    #astro-fab:hover { transform: scale(1.1); }
+
+    #astro-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+    }
+    .astro-panel {
+        background: rgba(20, 20, 30, 0.95); border: 2px solid #ffd860; padding: 80px;
+        border-radius: 20px; text-align: center; position: relative; width: 600px;
+        box-shadow: 0 0 50px rgba(255, 216, 96, 0.2);
+    }
+    .astro-panel h2 { color: #fff; margin-bottom: 5px; font-family: sans-serif; }
+    .astro-panel p { color: #ccc; margin-bottom: 30px; font-family: sans-serif; }
+    
+    .widget-mic {
+        width: 100px; height: 100px; margin: 0 auto; background: rgba(255,216,96,0.1);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        border: 2px solid #ffd860; cursor: pointer; position: relative; font-size: 2rem; color: #ffd860;
+    }
+    .widget-mic.listening { box-shadow: 0 0 40px #ffd860; background: #ffd860; color: #000; }
+    
+    .w-vision-btn {
+        width: 100%; padding: 12px; margin-top: 20px; background: transparent;
+        border: 1px solid #ffd860; color: #ffd860; border-radius: 8px; cursor: pointer;
+        font-weight: 700; transition: 0.3s;
+    }
+    .w-vision-btn.active { background: #ffd860; color: #000; }
+    
+    .w-hud { margin-top: 20px; display: flex; justify-content: space-between; font-size: 0.9rem; color: #fff; }
+    .close-widget { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+    
+    #w-camera-preview {
+        position: absolute; top: 20px; right: 20px; width: 120px; border-radius: 10px;
+        border: 2px solid #ffd860; display: none; transform: scaleX(-1);
+    }
+/* Responsive footer adjustments can be added similarly */
+
+
+
+
+
+
+
+
+
+
+
+  </style>
+</head>
+<body>
+  <canvas id="star-field"></canvas>
+
+<nav class="navbar">
+    <a href="homepage.html" class="navbar-logo"><img src="mylogo.png" alt="StellerAtlas Logo"></a>
+    <div class="navbar-menu">
+<a href="homepage.html">HOME</a>
+<a href="blogpage.html">BLOGS</a>
+<a href="astronomy.html">ASTRONOMY</a>
+<a href="resources.html">RESOURCES</a>
+<a href="community.html">COMMUNITY</a>
+<a href="missions.html">MISSIONS</a>
+<a href="pricing.html">PRICING</a>
+<a href="login.html" class="login-btn">LOGIN</a>
+    </div>
+    
+  </nav>
+<div id="astro-widget-container">
+    <button id="astro-fab" onclick="window.AstroWidget.toggle()">
+        <i class="fa-solid fa-eye"></i>
+    </button>
+
+    <div id="astro-overlay">
+        <div class="astro-panel">
+            <button class="close-widget" onclick="window.AstroWidget.toggle()">&times;</button>
+            <h2>ASTRO-BRIEF AI</h2>
+            <p>Your Co-Pilot is Ready.</p>
+            
+            <div class="widget-mic" onmousedown="window.AstroWidget.startListening()" onmouseup="window.AstroWidget.stopListening()">
+                <div class="w-mic-ring"></div>
+                <i class="fa-solid fa-microphone"></i>
+            </div>
+            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Hold Spacebar or Click</p>
+
+            <button class="w-vision-btn" id="w-vision-btn" onclick="window.AstroWidget.toggleCamera()">
+                <i class="fa-solid fa-camera"></i> Vision
+            </button>
+
+            <div class="w-hud">
+                <span id="w-status">Ready</span>
+                <span id="w-latency" style="color:#0f0; font-family:monospace;">0.0s</span>
+            </div>
+        </div>
+        <video id="w-camera-preview" autoplay playsinline></video>
+        <canvas id="w-snapshot-canvas" style="display:none;"></canvas>
+    </div>
+</div>
+  <main>
+    <div class="filter-controls">
+      <button class="active" data-filter="all">All</button>
+      <button data-filter="nasa">NASA</button>
+      <button data-filter="spacex">SpaceX</button>
+      <button data-filter="isro">ISRO</button>
+      <button data-filter="esa">ESA</button>
+      <button data-filter="discoveries">Discoveries</button>
+      <button data-filter="missions">Missions</button>
+    </div>
+
+    <div class="article-grid">
+      <a href="https://www.bbc.com/news/articles/cjeenyw8rd2o" class="article-card-link"><div class="article-card" data-category="nasa discoveries"><img src="deepspace.png" alt="JWST Deep Field" class="thumbnail"><div class="card-header"><img src="nasa.png" alt="NASA Logo" class="source-logo"><h3>JWST Uncovers Oldest Galaxy Ever Observed</h3></div><div class="card-footer"><span class="date">Sep 28, 2025</span><span class="tags">#JWST #Discoveries</span></div></div></a>
+      <a href="https://nss.org/the-national-space-society-cheers-spacex-starship-launch-test/" class="article-card-link"><div class="article-card" data-category="spacex missions"><img src="starship.png" alt="Starship Launch" class="thumbnail"><div class="card-header"><img src="spacex.png" alt="SpaceX Logo" class="source-logo"><h3>Starship Completes First Manned Orbital Test Flight</h3></div><div class="card-footer"><span class="date">Sep 27, 2025</span><span class="tags">#Starship #Missions</span></div></div></a>
+      <a href="https://space-india.com/indias-quest-for-crewed-space-flight-via-the-gaganyaan-mission/" class="article-card-link"><div class="article-card" data-category="isro missions"><img src="gaganyaan.png" alt="Gaganyaan Module" class="thumbnail"><div class="card-header"><img src="isro.png" alt="ISRO Logo" class="source-logo"><h3>ISRO Announces Crew for Upcoming Gaganyaan-3 Mission</h3></div><div class="card-footer"><span class="date">Sep 25, 2025</span><span class="tags">#Gaganyaan #Missions</span></div></div></a>
+      <a href="https://www.esa.int/Science_Exploration/Space_Science/Euclid/Euclid_s_first_images_the_dazzling_edge_of_darkness" class="article-card-link"><div class="article-card" data-category="esa discoveries"><img src="euclid.png" alt="Euclid Telescope Image" class="thumbnail"><div class="card-header"><img src="esa.png" alt="ESA Logo" class="source-logo"><h3>Euclid Telescope Delivers Stunning First Images of Dark Universe</h3></div><div class="card-footer"><span class="date">Sep 24, 2025</span><span class="tags">#Euclid #Discoveries</span></div></div></a>
+      <a href="https://blogs.esa.int/ariane6/blog/" class="article-card-link"><div class="article-card" data-category="esa missions"><img src="ariane.png" alt="Ariane 6 on launchpad" class="thumbnail"><div class="card-header"><img src="esa.png" alt="ESA Logo" class="source-logo"><h3>Ariane 6 Completes Full-Duration Engine Test Fire</h3></div><div class="card-footer"><span class="date">Sep 22, 2025</span><span class="tags">#Ariane6 #Missions</span></div></div></a>
+      <a href="https://blogs.esa.int/to-mars-and-back/2023/12/13/the-making-of-the-exomars-rover-movie/" class="article-card-link"><div class="article-card" data-category="esa missions"><img src="exomars.png" alt="Rosalind Franklin Rover" class="thumbnail"><div class="card-header"><img src="esa.png" alt="ESA Logo" class="source-logo"><h3>ExoMars Rover Rosalind Franklin Prepares for Martian Descent</h3></div><div class="card-footer"><span class="date">Sep 19, 2025</span><span class="tags">#ExoMars #Missions</span></div></div></a>
+      <a href="https://www.esa.int/Science_Exploration/Space_Science/Juice" class="article-card-link"><div class="article-card" data-category="esa discoveries"><img src="juice.png" alt="JUICE at Jupiter" class="thumbnail"><div class="card-header"><img src="esa.png" alt="ESA Logo" class="source-logo"><h3>JUICE Mission Successfully Deploys Ice-Penetrating Radar Antenna</h3></div><div class="card-footer"><span class="date">Sep 16, 2025</span><span class="tags">#JUICE #Discoveries</span></div></div></a>
+      <a href="https://aeon.co/essays/how-primordial-black-holes-might-explain-dark-matter" class="article-card-link"><div class="article-card" data-category="discoveries"><img src="blackhole.png" alt="Black Hole" class="thumbnail"><div class="card-header"><h3>New Evidence Suggests Primordial Black Holes Are Real</h3></div><div class="card-footer"><span class="date">Sep 22, 2025</span><span class="tags">#Cosmology #Discoveries</span></div></div></a>
+      <a href="https://science.nasa.gov/solar-system/moon/nasas-artemis-ii-lunar-science-operations-to-inform-future-missions/" class="article-card-link"><div class="article-card" data-category="nasa missions"><img src="artemis.png" alt="Artemis Moon Base" class="thumbnail"><div class="card-header"><img src="nasa.png" alt="NASA Logo" class="source-logo"><h3>NASA's Artemis Program Finalizes Location for Lunar Base</h3></div><div class="card-footer"><span class="date">Sep 20, 2025</span><span class="tags">#Artemis #Missions</span></div></div></a>
+      <a href="https://science.nasa.gov/blogs/psyche/2023/10/13/nasas-psyche-mission-first-to-a-metal-rich-asteroid/" class="article-card-link"><div class="article-card" data-category="nasa missions"><img src="psyche.png" alt="Psyche spacecraft" class="thumbnail"><div class="card-header"><img src="nasa.png" alt="NASA Logo" class="source-logo"><h3>Psyche Mission Begins 2.2-Billion-Mile Journey to Metal Asteroid</h3></div><div class="card-footer"><span class="date">Sep 18, 2025</span><span class="tags">#Psyche #Missions</span></div></div></a>
+      <a href="https://science.nasa.gov/universe/exoplanets/discovery-alert-a-super-earth-in-the-habitable-zone/" class="article-card-link"><div class="article-card" data-category="nasa discoveries"><img src="superearth.png" alt="Exoplanet illustration" class="thumbnail"><div class="card-header"><img src="nasa.png" alt="NASA Logo" class="source-logo"><h3>'Super-Earth' with Potential for Liquid Water Found in Nearby System</h3></div><div class="card-footer"><span class="date">Sep 15, 2025</span><span class="tags">#Exoplanet #Discoveries</span></div></div></a>
+      <a href="https://www.group.sener/en/insights/lunar-gateway-the-first-lunar-space-station-of-humanity/" class="article-card-link"><div class="article-card" data-category="nasa missions"><img src="lpe.png" alt="Lunar Gateway station" class="thumbnail"><div class="card-header"><img src="nasa.png" alt="NASA Logo" class="source-logo"><h3>First Modules for Lunar Gateway Space Station Begin Integration</h3></div><div class="card-footer"><span class="date">Sep 12, 2025</span><span class="tags">#Gateway #Missions</span></div></div></a>
+      <a href="https://science.nasa.gov/science-research/sail-along-with-nasas-solar-sail-tech-demo-in-real-time-simulation/" class="article-card-link"><div class="article-card" data-category="nasa tech"><img src="sail.png" alt="Solar sail" class="thumbnail"><div class="card-header"><img src="nasa.png" alt="NASA Logo" class="source-logo"><h3>Advanced Solar Sail Mission Demonstrates Record-Breaking Propulsion</h3></div><div class="card-footer"><span class="date">Sep 10, 2025</span><span class="tags">#Propulsion #Tech</span></div></div></a>
+      <a href="https://dearmoon.earth/" class="article-card-link"><div class="article-card" data-category="spacex missions"><img src="dearmoon.png" alt="dearMoon crew" class="thumbnail"><div class="card-header"><img src="spacex.png" alt="SpaceX Logo" class="source-logo"><h3>dearMoon Announces Final Crew Roster for Lunar Flyby</h3></div><div class="card-footer"><span class="date">Sep 09, 2025</span><span class="tags">#dearMoon #Missions</span></div></div></a>
+      <a href="https://eureka.patsnap.com/blog/raptor-3-engine-specs-performance/" class="article-card-link"><div class="article-card" data-category="spacex tech"><img src="raptor.png" alt="Raptor engine test" class="thumbnail"><div class="card-header"><img src="spacex.png" alt="SpaceX Logo" class="source-logo"><h3>Next-Generation Raptor 3 Engine Achieves New Thrust Record</h3></div><div class="card-footer"><span class="date">Sep 07, 2025</span><span class="tags">#Raptor #Tech</span></div></div></a>
+      <a href="https://www.nasa.gov/directorates/esdmd/artemis-campaign-development-division/human-landing-system-program/work-underway-on-large-cargo-landers-for-nasas-artemis-moon-missions/" class="article-card-link"><div class="article-card" data-category="spacex missions"><img src="cargo.png" alt="Red Dragon on Mars" class="thumbnail"><div class="card-header"><img src="spacex.png" alt="SpaceX Logo" class="source-logo"><h3>SpaceX Awarded NASA Contract for Unmanned Mars Cargo Lander</h3></div><div class="card-footer"><span class="date">Sep 05, 2025</span><span class="tags">#Mars #Missions</span></div></div></a>
+      <a href="https://www.spacelink-installations.co.uk/blog/all-you-need-to-know-about-starlink-gen-3/" class="article-card-link"><div class="article-card" data-category="spacex"><img src="starlink.png" alt="Starlink v3 satellites" class="thumbnail"><div class="card-header"><img src="spacex.png" alt="SpaceX Logo" class="source-logo"><h3>Starlink V3 Satellites to Include Inter-Satellite Laser Links</h3></div><div class="card-footer"><span class="date">Sep 02, 2025</span><span class="tags">#Starlink #Tech</span></div></div></a>
+      <a href="https://indianspacetechnology.com/shukrayaan-1-isro/" class="article-card-link"><div class="article-card" data-category="isro missions"><img src="shukrayaan.png" alt="Shukrayaan orbiter" class="thumbnail"><div class="card-header"><img src="isro.png" alt="ISRO Logo" class="source-logo"><h3>Shukrayaan-1 Venus Orbiter Enters Final Testing Phase</h3></div><div class="card-footer"><span class="date">Aug 30, 2025</span><span class="tags">#Shukrayaan #Missions</span></div></div></a>
+      <a href="https://eureka.patsnap.com/blog/what-is-a-scramjet-engine/" class="article-card-link"><div class="article-card" data-category="isro tech"><img src="scramjet.png" alt="Scramjet engine" class="thumbnail"><div class="card-header"><img src="isro.png" alt="ISRO Logo" class="source-logo"><h3>ISRO Successfully Tests Hypersonic Air-Breathing Scramjet Engine</h3></div><div class="card-footer"><span class="date">Aug 28, 2025</span><span class="tags">#Propulsion #Tech</span></div></div></a>
+      <a href="https://www.isro.gov.in/Aditya_L1_SUIT.html" class="article-card-link"><div class="article-card" data-category="isro discoveries"><img src="aditya.png" alt="Aditya-L1 solar data" class="thumbnail"><div class="card-header"><img src="isro.png" alt="ISRO Logo" class="source-logo"><h3>Aditya-L1 Captures Highest Resolution Images of Solar Corona</h3></div><div class="card-footer"><span class="date">Aug 25, 2025</span><span class="tags">#AdityaL1 #Discoveries</span></div></div></a>
+      <a href="https://forumias.com/blog/answered-highlight-the-significance-of-the-success-of-isros-reusable-launch-vehicle-mission/" class="article-card-link"><div class="article-card" data-category="isro missions"><img src="rlv.png" alt="Reusable Launch Vehicle" class="thumbnail"><div class="card-header"><img src="isro.png" alt="ISRO Logo" class="source-logo"><h3>Reusable Launch Vehicle (RLV) Completes Autonomous Landing Test</h3></div><div class="card-footer"><span class="date">Aug 21, 2025</span><span class="tags">#RLV #Missions</span></div></div></a>
+    </div>
+  </main>
+  
+  <script>
+    // Countdown timer for the upcoming events button
+    function startCountdown(seconds) {
+      let timer = seconds; const timerEl = document.getElementById('timer'); if (!timerEl) return;
+      setInterval(() => {
+        let h = Math.floor(timer / 3600); let m = Math.floor((timer % 3600) / 60); let s = timer % 60;
+        timerEl.textContent = `T-${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        if (timer > 0) timer--;
+      }, 1000);
+    }
+    // Set a plausible countdown from the current date for realism
+const launchTime = new Date('2025-10-14T11:53:00+05:30').getTime();
+const now = new Date().getTime();
+const duration = Math.floor((launchTime - now) / 1000);
+startCountdown(duration > 0 ? duration : 0);
+
+    // --- Starfield Canvas Animation ---
+    const canvas = document.getElementById('star-field');
+    const ctx = canvas.getContext('2d');
+    let width, height, stars = [];
+    function initCanvas() {
+      width = window.innerWidth; height = window.innerHeight;
+      canvas.width = width; canvas.height = height;
+      stars = [];
+      for (let i = 0; i < 150; i++) {
+        stars.push({
+          x: Math.random() * width, y: Math.random() * height,
+          radius: Math.random() * 1.5 + 0.5, alpha: Math.random(),
+          decreasing: Math.random() > 0.5,
+          vx: (Math.random() - 0.5) * 0.1, vy: (Math.random() - 0.5) * 0.1
+        });
+      }
+    }
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
+      stars.forEach(star => {
+        if (star.decreasing) { star.alpha -= 0.007; if (star.alpha <= 0.1) star.decreasing = false; } 
+        else { star.alpha += 0.007; if (star.alpha >= 1) star.decreasing = true; }
+        star.x += star.vx; star.y += star.vy;
+        if (star.x < 0 || star.x > width) star.vx = -star.vx;
+        if (star.y < 0 || star.y > height) star.vy = -star.vy;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+        ctx.fill();
+      });
+    }
+    window.addEventListener('resize', initCanvas);
+    function animateStars() { drawStars(); requestAnimationFrame(animateStars); }
+    initCanvas(); animateStars();
+
+    // --- BLOG PAGE JAVASCRIPT ---
+    document.addEventListener('DOMContentLoaded', () => {
+      const filterControls = document.querySelector('.filter-controls');
+      const articleLinks = document.querySelectorAll('.article-card-link');
+
+      // 1. Staggered Load Animation
+      articleLinks.forEach((link, index) => {
+        setTimeout(() => {
+          link.querySelector('.article-card').classList.add('visible');
+        }, 100 * (index + 1));
+      });
+
+      // 2. Filtering Logic
+      if (filterControls) {
+        filterControls.addEventListener('click', (e) => {
+          if (e.target.tagName !== 'BUTTON') return;
+
+          filterControls.querySelector('.active').classList.remove('active');
+          e.target.classList.add('active');
+          const filter = e.target.dataset.filter;
+
+          articleLinks.forEach(link => {
+            const category = link.querySelector('.article-card').dataset.category;
+            if (filter === 'all' || category.includes(filter)) {
+              link.classList.remove('hidden');
+            } else {
+              link.classList.add('hidden');
+            }
+          });
+        });
+      }
+
+      // 3. 3D Hover Effect
+      articleLinks.forEach(link => {
+        const card = link.querySelector('.article-card');
+        const maxRotate = 15;
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const { width, height } = rect;
+          const rotateX = ((y / height) - 0.5) * -1 * maxRotate;
+          const rotateY = ((x / width) - 0.5) * maxRotate;
+          card.style.setProperty('--rotate-x', `${rotateX}deg`);
+          card.style.setProperty('--rotate-y', `${rotateY}deg`);
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.setProperty('--rotate-x', '0deg');
+          card.style.setProperty('--rotate-y', '0deg');
+        });
+      });
+    });
+  </script>
+  <footer>
+  <div class="footer-container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <img src="mylogo.png" alt="StellerAtlas Logo" class="logo-footer" />
+        <p>
+          Your one-stop platform for all things space, astrophysics, and
+          astronomy. Explore the cosmos with us.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="missions.html">Missions</a></li>
+          <li><a href="solar-system.html">Solar System</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="news.html">News</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Learn</h4>
+        <ul>
+          <li><a href="blogs.html">Blogs</a></li>
+          <li><a href="astronomy.html">Astronomy 101</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <ul>
+          <li><a href="about.html">About StellerAtlas</a></li>
+          <li><a href="team.html">Our Team</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="community.html">Community</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="X formerly Twitter"><img src="x.png" alt="X" /></a>
+          <a href="#" aria-label="Instagram"><img src="insta.png" alt="Instagram" /></a>
+          <a href="#" aria-label="YouTube"><img src="yt.png" alt="YouTube" /></a>
+          <a href="#" aria-label="Facebook"><img src="fb.png" alt="Facebook" /></a>
+        </div>
+        <h4 style="margin-top: 30px">Newsletter</h4>
+        <form class="newsletter-form">
+          <input type="email" placeholder="your.email@example.com" required />
+          <button type="submit">SUB</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 CosmicEcho. All Rights Reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script>
+window.AstroWidget = (function() {
+        let w_mediaRecorder = null;
+        let w_chunks = [];
+        let w_cameraOn = false;
+        let w_ctx = null; 
+        let w_isOpen = false; // Track if widget is open
+
+        function initAudio() {
+            if (!w_ctx) w_ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (w_ctx.state === 'suspended') w_ctx.resume();
+        }
+
+        function toggle() {
+            const overlay = document.getElementById('astro-overlay');
+            w_isOpen = (overlay.style.display === 'flex');
+            
+            if (w_isOpen) {
+                overlay.style.display = 'none';
+                w_isOpen = false;
+            } else {
+                overlay.style.display = 'flex';
+                w_isOpen = true;
+                initAudio();
+            }
+        }
+
+        // --- SPACEBAR LISTENER FOR WIDGET ---
+        document.addEventListener('keydown', (e) => {
+            // Only activate if widget is OPEN and space is pressed
+            if (w_isOpen && e.code === 'Space' && !e.repeat) {
+                startListening();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (w_isOpen && e.code === 'Space') {
+                stopListening();
+            }
+        });
+        // -------------------------------------
+
+        async function toggleCamera() {
+            const video = document.getElementById('w-camera-preview');
+            const btn = document.getElementById('w-vision-btn');
+            if (!w_cameraOn) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                    video.srcObject = stream; video.style.display = 'block';
+                    w_cameraOn = true; btn.classList.add('active');
+                } catch(e) { alert("Camera Permission Denied"); }
+            } else {
+                if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                video.style.display = 'none'; w_cameraOn = false; btn.classList.remove('active');
+            }
+        }
+
+        async function startListening() {
+            initAudio();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                w_mediaRecorder = new MediaRecorder(stream);
+                w_chunks = [];
+                w_mediaRecorder.ondataavailable = e => w_chunks.push(e.data);
+                w_mediaRecorder.onstop = sendData;
+                w_mediaRecorder.start();
+                
+                document.querySelector('.widget-mic').classList.add('listening');
+                document.getElementById('w-status').innerText = "Listening...";
+                playTone(400);
+            } catch(e) { 
+                alert("Microphone Needed."); 
+            }
+        }
+
+        function stopListening() {
+            if(w_mediaRecorder && w_mediaRecorder.state !== 'inactive') w_mediaRecorder.stop();
+            document.querySelector('.widget-mic').classList.remove('listening');
+            document.getElementById('w-status').innerText = "Thinking...";
+            playTone(300);
+        }
+
+        async function sendData() {
+            const blob = new Blob(w_chunks, {type: 'audio/wav'});
+            const formData = new FormData();
+            formData.append("audio_data", blob, "voice.wav");
+
+            if(w_cameraOn) {
+                const vid = document.getElementById('w-camera-preview');
+                const can = document.getElementById('w-snapshot-canvas');
+                can.width = vid.videoWidth; can.height = vid.videoHeight;
+                can.getContext('2d').drawImage(vid, 0, 0);
+                const imgBlob = await new Promise(r => can.toBlob(r, 'image/jpeg'));
+                formData.append("image_data", imgBlob, "frame.jpg");
+            }
+
+            let start = Date.now();
+            fetch('/process_audio', {method: 'POST', body: formData})
+            .then(r => r.json())
+            .then(d => {
+                let lat = (Date.now() - start)/1000;
+                document.getElementById('w-latency').innerText = lat.toFixed(2) + 's';
+                document.getElementById('w-status').innerText = "Speaking...";
+                
+                if(d.sonification_data?.length > 0) {
+                    playMusic(d.sonification_data, () => { if(d.audio_base64) playAudio(d.audio_base64); });
+                } else if(d.audio_base64) {
+                    playAudio(d.audio_base64);
+                }
+            })
+            .catch(e => { console.error(e); document.getElementById('w-status').innerText = "Offline?"; });
+        }
+
+        function playTone(f) {
+            if(!w_ctx) return;
+            const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+            o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(w_ctx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.1); o.stop(w_ctx.currentTime+0.1);
+        }
+        function playMusic(d, cb) {
+            let i=0; let iv = setInterval(() => {
+                if(i>=d.length) { clearInterval(iv); cb(); return; }
+                const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+                o.type='triangle'; o.frequency.value=200+(d[i]*6); o.connect(g); g.connect(w_ctx.destination);
+                o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.15); o.stop(w_ctx.currentTime+0.15);
+                i++;
+            }, 120);
+        }
+        function playAudio(b64) {
+            new Audio("data:audio/mp3;base64,"+b64).play();
+        }
+
+        return { toggle, toggleCamera, startListening, stopListening };
+    })();
+</script>
+</body>
+</html>

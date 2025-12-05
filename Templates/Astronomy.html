@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar Atlas-Astronomy Page</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+     
+
+        :root {
+            --primary-bg: #000000;
+            --glass-bg: rgba(10, 10, 20, 0.55);
+            --border-color: rgba(255, 216, 96, 0.2);
+            --primary-text: #E0E0E0;
+            --heading-text: #FFFFFF;
+            --accent-color: #FFD860; /* A stellar gold */
+            --accent-glow: rgba(255, 216, 96, 0.2);
+            --success-color: #4CAF50;
+            --error-color: #F44336;
+            --font-family: 'Montserrat', sans-serif;
+            --max-width: 1200px;
+            --border-radius: 12px;
+            --transition-speed: 0.4s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            line-height: 1.7;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+
+        /* Navigation Bar */
+        nav.navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 40px;
+        }
+
+        .navbar-logo img {
+            height: 80px;
+            width: auto;
+            transition: transform var(--transition-fast), filter var(--transition-fast);
+        }
+
+        .navbar-logo img:hover {
+            transform: scale(1.08);
+            filter: drop-shadow(0 0 8px var(--accent-color));
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar-menu a {
+            color: #ececec;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.04rem;
+            letter-spacing: 0.03em;
+            padding: 8px 15px;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .navbar-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform var(--transition-fast);
+        }
+
+        .navbar-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar-menu a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.active {
+            color: var(--accent-color);
+        }
+
+        .navbar-menu a.active::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.login-btn {
+            background: var(--accent-color);
+    color: var(--dark-bg);
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-left: 10px;
+            
+        }
+
+        .navbar-menu a.login-btn:hover {
+            background: #ffed4e;
+            color: var(--dark-bg);
+        }
+
+        .navbar-menu a.login-btn::after {
+            display: none;
+        
+        }
+        /* ---------------------------------- */
+        /* --- 2. Background & Overlays --- */
+        /* ---------------------------------- */
+        #background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        #bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+        }
+        
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* ---------------------------------- */
+        /* --- 3. Layout & Section Styling --- */
+        /* ---------------------------------- */
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        main > section {
+            padding: 6rem 0;
+            position: relative;
+        }
+        
+        /* The core "Glassmorphism" card style */
+        .glass-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* On-scroll animation setup */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---------------------------------- */
+        /* --- 4. Typography --- */
+        /* ---------------------------------- */
+        h1, h2, h3 {
+            color: var(--heading-text);
+            font-weight: 600;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            margin-bottom: 3rem;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color var(--transition-speed) ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        ul li {
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+
+        ul li::before {
+            content: '✦';
+            position: absolute;
+            left: -1.5rem;
+            color: var(--accent-color);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* ---------------------------------- */
+        /* --- 5. UI Components (Buttons, Forms) --- */
+        /* ---------------------------------- */
+        .btn {
+            display: inline-block;
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            padding: 0.8rem 1.8rem;
+            border: 2px solid var(--accent-color);
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--primary-text);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* ---------------------------------- */
+        /* --- 6. Header & Hero Section --- */
+        /* ---------------------------------- */
+        .hero {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .hero h2 span {
+            font-size: 140%;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+            animation: fadeInChar 0.5s forwards;
+        }
+
+        @keyframes fadeInChar {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .hero .container {
+           padding-top: 10vh;
+        }
+
+        /* ---------------------------------- */
+        /* --- 7. Specific Section Layouts --- */
+        /* ---------------------------------- */
+
+        /* Weather Section */
+        #weather-results {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius);
+            display: none; /* Hidden by default */
+        }
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+        .weather-item {
+            text-align: center;
+        }
+        .weather-item svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 0.5rem;
+            fill: var(--accent-color);
+        }
+        .weather-item .label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        .weather-item .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        #stargazing-score {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+        #stargazing-score .score-text {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .score-Excellent { color: #4CAF50; }
+        .score-Good { color: #8BC34A; }
+        .score-Fair { color: #FFEB3B; }
+        .score-Poor { color: #F44336; }
+
+        /* Telescope Section */
+        .telescope-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .telescope-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            transition: all var(--transition-speed) ease;
+        }
+        .telescope-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px var(--accent-glow);
+            border-color: var(--accent-color);
+        }
+        .telescope-card img {
+            max-width: 180px;
+            height: auto;
+            margin-bottom: 1.5rem;
+        }
+        .telescope-card .pros, .telescope-card .cons {
+            text-align: left;
+            margin-top: 1rem;
+        }
+        .telescope-card .pros li::before { content: '✓'; color: var(--success-color); }
+        .telescope-card .cons li::before { content: '✕'; color: var(--error-color); }
+
+        /* Accessories Section */
+        .accordion-item {
+            border-bottom: 1px solid var(--border-color);
+        }
+        .accordion-header {
+            padding: 1.5rem 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color var(--transition-speed) ease;
+        }
+        .accordion-header:hover {
+            background-color: rgba(255, 216, 96, 0.05);
+        }
+        .accordion-header::after {
+            content: '+';
+            font-size: 2rem;
+            color: var(--accent-color);
+            transition: transform var(--transition-speed) ease;
+        }
+        .accordion-item.active .accordion-header::after {
+            transform: rotate(45deg);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease;
+            padding: 0 1rem;
+        }
+
+        /* Sun Locator Section */
+        #sun-locator-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        #sun-locator-form .form-group {
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 0;
+        }
+        #sun-locator-results {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius);
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+        #sun-locator-results .result-item {
+            text-align: center;
+        }
+        #sun-locator-results .label {
+             font-size: 0.9rem;
+            color: #aaa;
+        }
+        #sun-locator-results .value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        /* Calendar Section */
+        .calendar-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .calendar-event {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .event-date {
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .event-date .month {
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+        .event-date .day {
+            font-size: 2.5rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .event-details h3 {
+            margin-bottom: 0.5rem;
+            color: var(--heading-text);
+        }
+
+        /* ---------------------------------- */
+        /* --- 8. Responsiveness --- */
+        /* ---------------------------------- */
+        @media (max-width: 768px) {
+            main > section {
+                padding: 4rem 0;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            h2 {
+                font-size: 1.8rem;
+            }
+            .form-group {
+                flex-direction: column;
+            }
+            #sun-locator-form {
+                 grid-template-columns: 1fr;
+            }
+            .calendar-event {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+                text-align: center;
+            }
+        }
+        /* PROFESSIONAL FOOTER STYLES */
+    footer {
+      position: relative;
+      z-index: 5;
+      background: #050505;
+      padding: 80px 40px 20px 40px;
+      border-top: 4px solid var(--accent-color);
+      color: #999;
+    }
+    .footer-container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr repeat(4, 1fr);
+      gap: 50px;
+      margin-bottom: 60px;
+    }
+    .footer-col .logo-footer {
+      height: 50px;
+      margin-bottom: 20px;
+    }
+    .footer-col p {
+      line-height: 1.7;
+      max-width: 300px;
+    }
+    .footer-col h4 {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+      color: var(--primary-color);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+    }
+    .footer-col ul li {
+      margin-bottom: 15px;
+    }
+    .footer-col a {
+      text-decoration: none;
+      color: #999;
+      transition: color var(--transition-fast);
+    }
+    .footer-col a:hover {
+      color: var(--accent-color);
+    }
+    .social-icons {
+      display: flex;
+      gap: 15px;
+    }
+    .social-icons a {
+      font-size: 1.2rem;
+      color: #999;
+      background-color: #222;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+    .social-icons a:hover {
+      background-color: var(--accent-color);
+      color: #000;
+    }
+
+    .newsletter-form {
+      display: flex;
+      margin-top: 10px;
+      max-width: 250px;
+    }
+    .newsletter-form input {
+      flex-grow: 1;
+      padding: 12px;
+      border: 1px solid #444;
+      background: #222;
+      color: var(--primary-color);
+      border-radius: 5px 0 0 5px;
+      outline: none;
+    }
+    .newsletter-form button {
+      padding: 12px 20px;
+      border: 1px solid var(--accent-color);
+      background: var(--accent-color);
+      color: var(--dark-bg);
+      cursor: pointer;
+      font-weight: 700;
+      border-radius: 0 5px 5px 0;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .newsletter-form button:hover {
+      background: #ffedaa;
+    }
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-bottom-links a {
+      color: #999;
+      text-decoration: none;
+      margin-left: 20px;
+      transition: color var(--transition-fast);
+    }
+    .footer-bottom-links a:hover {
+      color: var(--accent-color);
+    }
+
+    @media (max-width: 1024px) {
+      .footer-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+    }
+    @media (max-width: 600px) {
+        .footer-bottom {
+            flex-direction: column;
+            justify-content: center;
+        }
+    }
+
+
+
+    /* High Z-Index ensures it sits on top of EVERYTHING */
+    #astro-fab {
+        position: fixed !important; 
+        bottom: 30px !important; 
+        right: 30px !important; 
+        width: 65px !important; 
+        height: 65px !important;
+        background: #ffd860 !important; 
+        color: #000 !important; 
+        border: 3px solid #000 !important; 
+        border-radius: 50% !important;
+        font-size: 26px !important; 
+        cursor: pointer !important; 
+        box-shadow: 0 0 20px rgba(255, 216, 96, 0.6) !important;
+        z-index: 2147483647 !important; /* Max Layer Priority */
+        transition: transform 0.2s !important;
+        display: flex !important; 
+        align-items: center !important; 
+        justify-content: center !important;
+    }
+    #astro-fab:hover { transform: scale(1.1); }
+
+    #astro-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); 
+        z-index: 2147483646; /* Just underneath button */
+        display: none; align-items: center; justify-content: center;
+    }
+    
+    .astro-panel {
+        background: #111; border: 2px solid #ffd860; padding: 40px;
+        border-radius: 20px; text-align: center; position: relative; width: 350px;
+        box-shadow: 0 0 50px rgba(255, 216, 96, 0.3);
+    }
+    .astro-panel h2 { color: #fff; margin: 0 0 5px 0; font-family: sans-serif; font-size: 1.8rem; }
+    .astro-panel p { color: #ccc; margin: 0 0 30px 0; font-family: sans-serif; }
+    
+    .widget-mic {
+        width: 100px; height: 100px; margin: 0 auto; background: rgba(255,216,96,0.1);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        border: 2px solid #ffd860; cursor: pointer; position: relative; font-size: 2rem; color: #ffd860;
+        transition: 0.2s;
+    }
+    .widget-mic.listening { box-shadow: 0 0 50px #ffd860; background: #ffd860; color: #000; }
+    
+    .w-vision-btn {
+        width: 100%; padding: 12px; margin-top: 20px; background: transparent;
+        border: 1px solid #ffd860; color: #ffd860; border-radius: 8px; cursor: pointer;
+        font-weight: 700; transition: 0.3s; font-size: 1rem;
+    }
+    .w-vision-btn.active { background: #ffd860; color: #000; }
+    
+    .w-hud { margin-top: 20px; display: flex; justify-content: space-between; font-size: 0.9rem; color: #fff; border-top: 1px solid #333; padding-top: 10px;}
+    .close-widget { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; line-height: 1; }
+    
+    #w-camera-preview {
+        position: absolute; top: 20px; right: 20px; width: 140px; border-radius: 10px;
+        border: 2px solid #ffd860; display: none; transform: scaleX(-1); z-index: 2147483647;
+    }
+    </style>
+    <script src="https://unpkg.com/suncalc@1.8.0/suncalc.js"></script>
+
+</head>
+
+<body>
+
+
+    <nav class="navbar">
+    <a href="homepage.html" class="navbar-logo"><img src="mylogo.png" alt="StellerAtlas Logo"></a>
+    <div class="navbar-menu">
+<a href="homepage.html">HOME</a>
+<a href="blogpage.html">BLOGS</a>
+<a href="astronomy.html">ASTRONOMY</a>
+<a href="resources.html">RESOURCES</a>
+<a href="community.html">COMMUNITY</a>
+<a href="missions.html">MISSIONS</a>
+<a href="pricing.html">PRICING</a>
+<a href="login.html" class="login-btn">LOGIN</a>
+    </div>
+    
+  </nav>
+
+  
+<button id="astro-fab" onclick="window.AstroWidget.toggle()" title="Open Astro-Brief">
+    <i class="fa-solid fa-eye"></i>
+</button>
+
+<div id="astro-overlay">
+    <div class="astro-panel">
+        <button class="close-widget" onclick="window.AstroWidget.toggle()">&times;</button>
+        <h2>ASTRO-BRIEF</h2>
+        <p>Your Co-Pilot is Ready.</p>
+        
+        <div class="widget-mic" onmousedown="window.AstroWidget.startListening()" onmouseup="window.AstroWidget.stopListening()">
+            <div class="w-mic-ring"></div>
+            <i class="fa-solid fa-microphone"></i>
+        </div>
+        <p style="font-size:0.8rem; color:#888; margin-top:10px;">Hold to Speak</p>
+
+        <button class="w-vision-btn" id="w-vision-btn" onclick="window.AstroWidget.toggleCamera()">
+            <i class="fa-solid fa-camera"></i> Vision
+        </button>
+
+        <div class="w-hud">
+            <span id="w-status">System Standby</span>
+            <span id="w-latency" style="color:#0f0; font-family:monospace;">--</span>
+        </div>
+    </div>
+    
+    <video id="w-camera-preview" autoplay playsinline></video>
+    <canvas id="w-snapshot-canvas" style="display:none;"></canvas>
+</div>
+
+    <div id="background-container">
+        <video id="bg-video" autoplay muted loop playsinline>
+            <source src="/static/bg.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    <canvas id="starfield"></canvas>
+    
+    <main>
+        <header class="hero">
+            <div class="container">
+                <h2 id="hero-title">Astronomy Tools and Space Events</h2>
+                <p>Your gateway to understanding the universe, from your backyard to the farthest galaxies.</p>
+            </div>
+        </header>
+
+        <section id="weather" class="fade-in-section">
+            <div class="container">
+                <h2>Tonight's Stargazing Forecast</h2>
+                <div class="glass-card">
+                    <p>Enter your city to get real-time astronomical conditions, including cloud cover, air quality, and moon phase, to determine if it's a good night to look up.</p>
+                    <div class="form-group">
+                        <input type="text" id="city-input" class="form-input" placeholder="Enter city name (e.g., London)">
+                        <button id="check-weather-btn" class="btn">Check Conditions</button>
+                    </div>
+                    <div id="weather-loader" style="text-align: center; display: none;">Loading forecast...</div>
+                    <div id="weather-error" style="text-align: center; color: var(--error-color); display: none;"></div>
+                    <div id="weather-results">
+                        <h3 id="location-name" style="text-align: center; margin-bottom: 2rem;"></h3>
+                        <div class="weather-grid">
+                            </div>
+                        <div id="stargazing-score">
+                            <h3>Stargazing Conditions</h3>
+                            <p class="score-text" id="score-value">Excellent</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        
+
+        <section id="guide-email" class="fade-in-section">
+            <div class="container">
+                <h2>Ready to Dive Deeper?</h2>
+                <div class="glass-card">
+                    <p>Get our complete, beautifully illustrated "Beginner's Stargazing Guide" delivered straight to your inbox. It's an offline-ready PDF packed with star charts, checklists, and more.</p>
+                    <div class="form-group">
+                        <input type="email" id="email-input" class="form-input" placeholder="your.email@example.com">
+                        <button id="send-guide-btn" class="btn">Send Guide</button>
+                    </div>
+                    <div id="email-feedback" style="text-align: center; margin-top: 1rem;"></div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="sun-locator" class="fade-in-section">
+            <div class="container">
+                <h2>Sun Locator & Golden Hour Calculator</h2>
+                <div class="glass-card">
+                    <p>Plan your daytime and twilight photography or observations by calculating key sun times for any location and date.</p>
+                    <div id="sun-locator-form">
+                        <div class="form-group">
+                            <label for="latitude">Latitude</label>
+                            <input type="number" id="latitude" class="form-input" placeholder="e.g., 34.0522">
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude">Longitude</label>
+                            <input type="number" id="longitude" class="form-input" placeholder="e.g., -118.2437">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" class="form-input">
+                        </div>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button id="calc-sun-btn" class="btn">Calculate</button>
+                            <button id="use-location-btn" class="btn btn-secondary">Use My Location</button>
+                        </div>
+                    </div>
+                    <div id="sun-locator-results">
+                        </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="calendar" class="fade-in-section">
+            <div class="container">
+                <h2>Upcoming Astronomical Events</h2>
+                <div class="calendar-list" id="calendar-list">
+                    </div>
+            </div>
+        </section>
+        
+    </main>
+    <footer class="fade-up-section">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <img src="mylogo.png" alt="StellerAtlas Logo" class="logo-footer">
+          <p>Your one-stop platform for all things space, astrophysics, and astronomy. Explore the cosmos with us.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="#missions">Missions</a></li>
+            <li><a href="#solar-system">Solar System</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#news">News</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="#blogs">Blogs</a></li>
+            <li><a href="#astronomy">Astronomy 101</a></li>
+            <li><a href="#resources">Resources</a></li>
+            <li><a href="#">Glossary</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>About</h4>
+          <ul>
+            <li><a href="#about">About StellerAtlas</a></li>
+            <li><a href="#">Our Team</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#community">Community</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <div class="social-icons">
+            <a href="#" aria-label="X (formerly Twitter)"><img src="x.png"></img></a>
+            <a href="#" aria-label="Instagram"><img src="insta.png"></img></a>
+            <a href="#" aria-label="YouTube"><img src="yt.png"></img></a>
+            <a href="#" aria-label="Facebook"><img src="fb.png"></img></a>
+          </div>
+          <h4 style="margin-top: 30px;">Newsletter</h4>
+          <form class="newsletter-form">
+            <input type="email" placeholder="your.email@example.com" required>
+            <button type="submit">SUB</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 CosmicEcho. All Rights Reserved.</p>
+        <div class="footer-bottom-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+    <script>
+
+         // Countdown timer for the upcoming events button
+    function startCountdown(seconds) {
+      let timer = seconds; const timerEl = document.getElementById('timer'); if (!timerEl) return;
+      setInterval(() => {
+        let h = Math.floor(timer / 3600); let m = Math.floor((timer % 3600) / 60); let s = timer % 60;
+        timerEl.textContent = `T-${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        if (timer > 0) timer--;
+      }, 1000);
+    }
+    // Set a plausible countdown from the current date for realism
+const launchTime = new Date('2025-10-14T11:53:00+05:30').getTime();
+const now = new Date().getTime();
+const duration = Math.floor((launchTime - now) / 1000);
+startCountdown(duration > 0 ? duration : 0);
+    document.addEventListener('DOMContentLoaded', () => {
+
+        /* ---------------------------------- */
+        /* --- 1. Starfield Canvas Animation --- */
+        /* ---------------------------------- */
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const stars = [];
+        const numStars = 200;
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5,
+                alpha: Math.random(),
+                speed: Math.random() * 0.1 + 0.05
+            });
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.globalAlpha = star.alpha;
+                ctx.fill();
+
+                star.y -= star.speed;
+                if (star.y < 0) {
+                    star.y = canvas.height;
+                }
+            });
+            requestAnimationFrame(drawStars);
+        }
+        drawStars();
+        
+        /* ---------------------------------- */
+        /* --- 2. Hero Title Animation --- */
+        /* ---------------------------------- */
+        const heroTitle = document.getElementById('hero-title');
+        const text = heroTitle.textContent;
+        heroTitle.innerHTML = '';
+        text.split('').forEach((char, index) => {
+            const span = document.createElement('span');
+            span.textContent = char === ' ' ? '\u00A0' : char;
+            span.style.animationDelay = `${index * 0.05}s`;
+            heroTitle.appendChild(span);
+        });
+
+        /* ---------------------------------- */
+        /* --- 3. On-Scroll Fade-In Animation --- */
+        /* ---------------------------------- */
+        const sections = document.querySelectorAll('.fade-in-section');
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        /* ---------------------------------- */
+        /* --- 4. Accordion Functionality --- */
+        /* ---------------------------------- */
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+            header.addEventListener('click', () => {
+                // Close other open accordions
+                accordionItems.forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                        otherItem.querySelector('.accordion-content').style.maxHeight = null;
+                    }
+                });
+                
+                // Toggle current accordion
+                item.classList.toggle('active');
+                if (item.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                } else {
+                    content.style.maxHeight = null;
+                }
+            });
+        });
+        
+        /* ---------------------------------- */    
+        /* --- 5. Astronomy Weather Logic --- */
+        /* ---------------------------------- */
+        const cityInput = document.getElementById('city-input');
+        const checkWeatherBtn = document.getElementById('check-weather-btn');
+        const weatherLoader = document.getElementById('weather-loader');
+        const weatherError = document.getElementById('weather-error');
+        const weatherResults = document.getElementById('weather-results');
+        
+        // HACKATHON HELPER NOTE: Use your own free API key from OpenWeatherMap.
+        const weatherApiKey = 'bcabde10bc4908e6ce0fa1d2808c6d07'; 
+
+        checkWeatherBtn.addEventListener('click', () => {
+            const city = cityInput.value.trim();
+            if (!city) {
+                showWeatherError('Please enter a city name.');
+                return;
+            }
+            fetchWeatherData(city);
+        });
+
+        async function fetchWeatherData(city) {
+            weatherLoader.style.display = 'block';
+            weatherError.style.display = 'none';
+            weatherResults.style.display = 'none';
+            
+            if (weatherApiKey === 'Your_API_Key') {
+                showWeatherError('API Key not configured. Please add your OpenWeatherMap API key in the script.');
+                weatherLoader.style.display = 'none';
+                return;
+            }
+
+            try {
+                // Fetch current weather and air pollution data
+                const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${weatherApiKey}`;
+                const weatherResponse = await fetch(weatherUrl);
+                if (!weatherResponse.ok) throw new Error(`City not found or API error.`);
+                const weatherData = await weatherResponse.json();
+                
+                const { lat, lon } = weatherData.coord;
+                const pollutionUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${weatherApiKey}`;
+                const pollutionResponse = await fetch(pollutionUrl);
+                const pollutionData = await pollutionResponse.json();
+                
+                displayWeatherData(weatherData, pollutionData);
+
+            } catch (error) {
+                showWeatherError(error.message);
+            } finally {
+                weatherLoader.style.display = 'none';
+            }
+        }
+        
+        function displayWeatherData(weather, pollution) {
+            weatherResults.style.display = 'block';
+            document.getElementById('location-name').textContent = `Forecast for ${weather.name}, ${weather.sys.country}`;
+            
+            const weatherGrid = weatherResults.querySelector('.weather-grid');
+            const aqi = pollution.list[0].main.aqi;
+            const moonPhase = calculateMoonPhase(new Date());
+
+            weatherGrid.innerHTML = `
+      
+                <div class="weather-item">
+                    <svg viewBox="0 0 24 24"><path d="M17.5,21A4.5,4.5 0 0,1 13,16.5A4.5,4.5 0 0,1 17.5,12A4.5,4.5 0 0,1 22,16.5A4.5,4.5 0 0,1 17.5,21M5,20V18H11V20H5M5,16V14H11V16H5M3,12V10H18.5C18.14,9.45 17.84,8.93 17.59,8.44L3,8V6H17.21C16.5,4.24 14.9,3 13,3C10.79,3 9,4.31 8.23,6H3V4H8C8.63,2.75 9.71,1.73 11,1.21V1H13V1.21C14.29,1.73 15.37,2.75 16,4H21V6H19.53C19.82,6.58 20.03,7.21 20.17,7.88L21,8V10H19.06A6.45,6.45 0 0,0 19,12H3Z" /></svg>
+                    <div class="label">Wind Speed</div>
+                    <div class="value">${weather.wind.speed} m/s</div>
+                </div>
+                <div class="weather-item">
+                    <svg viewBox="0 0 24 24"><path d="M19.36,10.04C18.67,6.59 15.64,4 12,4C9.11,4 6.6,5.64 5.35,8.04C2.34,8.36 0,10.91 0,14C0,17.31 2.69,20 6,20H19C21.76,20 24,17.76 24,15C24,12.36 21.95,10.22 19.36,10.04Z" /></svg>
+                    <div class="label">Cloud Cover</div>
+                    <div class="value">${weather.clouds.all}%</div>
+                </div>
+                <div class="weather-item">
+                    <svg viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2Z" /></svg>
+                    <div class="label">Moon Phase</div>
+                    <div class="value">${moonPhase.phaseName}</div>
+                </div>
+                <div class="weather-item">
+                    <svg viewBox="0 0 24 24"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.79 19.1,7.8 17.65,6.35M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M12,8V12L15,15L16,13.7L13.5,11.5V8H12Z" /></svg>
+                    <div class="label">Humidity</div>
+                    <div class="value">${weather.main.humidity}%</div>
+            `;
+            
+            // Calculate and display stargazing score
+            const { scoreText, scoreClass } = calculateStargazingScore(weather.clouds.all, moonPhase.value, aqi);
+            const scoreValue = document.getElementById('score-value');
+            scoreValue.textContent = scoreText;
+            scoreValue.className = `score-text ${scoreClass}`;
+        }
+        
+        function showWeatherError(message) {
+            weatherError.textContent = `Error: ${message}`;
+            weatherError.style.display = 'block';
+            weatherResults.style.display = 'none';
+        }
+
+        function getAqiText(aqi) {
+            switch (aqi) {
+                case 1: return 'Good';
+                case 2: return 'Fair';
+                case 3: return 'Moderate';
+                case 4: return 'Poor';
+                case 5: return 'Very Poor';
+                default: return 'Unknown';
+            }
+        }
+        
+        function calculateMoonPhase(date) {
+            // Simplified moon phase calculation for demonstration purposes
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const age = ((((year - 2000) * 12.37) + month + day) % 30);
+            
+            if (age < 1.84566) return { phaseName: "New Moon", value: 0 };
+            if (age < 5.53699) return { phaseName: "Waxing Crescent", value: 0.25 };
+            if (age < 9.22831) return { phaseName: "First Quarter", value: 0.5 };
+            if (age < 12.91963) return { phaseName: "Waxing Gibbous", value: 0.75 };
+            if (age < 16.61096) return { phaseName: "Full Moon", value: 1 };
+            if (age < 20.30228) return { phaseName: "Waning Gibbous", value: 0.75 };
+            if (age < 23.99361) return { phaseName: "Last Quarter", value: 0.5 };
+            if (age < 27.68493) return { phaseName: "Waning Crescent", value: 0.25 };
+            return { phaseName: "New Moon", value: 0 };
+        }
+        
+        function calculateStargazingScore(cloudCover, moonPhaseValue, aqi) {
+            let score = 0;
+
+            // Cloud cover score (up to 50 points)
+            score += Math.max(0, 50 - cloudCover * 0.5);
+            // Moon phase score (up to 30 points)
+            score += (1 - moonPhaseValue) * 30;
+            // AQI score (up to 20 points)
+            score += Math.max(0, (5 - aqi) * 4);
+            
+            if (score > 85) return { scoreText: 'Excellent', scoreClass: 'score-Excellent' };
+            if (score > 65) return { scoreText: 'Good', scoreClass: 'score-Good' };
+            if (score > 40) return { scoreText: 'Fair', scoreClass: 'score-Fair' };
+            return { scoreText: 'Poor', scoreClass: 'score-Poor' };
+        }
+
+            /* ---------------------------------- */
+            /* --- 6. Email Guide Form Logic --- */
+            /* ---------------------------------- */
+            const emailInput = document.getElementById('email-input');
+            const sendGuideBtn = document.getElementById('send-guide-btn');
+            const emailFeedback = document.getElementById('email-feedback');
+            
+            sendGuideBtn.addEventListener('click', () => {
+                const email = emailInput.value;
+                const originalText = sendGuideBtn.textContent;
+                
+                // Simple email validation
+                if (!/^\S+@\S+\.\S+$/.test(email)) {
+                    emailFeedback.textContent = 'Please enter a valid email address.';
+                    emailFeedback.style.color = 'var(--error-color)';
+                    return;
+                }
+                
+                // Simulate API call
+                sendGuideBtn.textContent = 'Sending...';
+                sendGuideBtn.disabled = true;
+                emailFeedback.textContent = '';
+                
+                // Real API call to backend
+    emailFeedback.textContent = 'Sending...';
+    sendGuideBtn.disabled = true;
+    sendGuideBtn.textContent = 'Sending...';
+
+    fetch('http://127.0.0.1:5000/send-pdf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+    })
+    .then(response => response.json())
+    .then(result => {
+        emailFeedback.textContent = result.message || 'Success! Your guide is on its way.';
+        emailFeedback.style.color = 'var(--success-color)';
+        sendGuideBtn.textContent = '✓ Sent!';
+    })
+    .catch(error => {
+        emailFeedback.textContent = 'Failed to send email. Please try again.';
+        emailFeedback.style.color = 'var(--error-color)';
+        sendGuideBtn.textContent = originalText;
+    })
+    .finally(() => {
+        setTimeout(() => {
+        emailFeedback.textContent = '';
+        sendGuideBtn.disabled = false;
+        sendGuideBtn.textContent = originalText;
+        emailInput.value = '';
+        }, 4000);
+    });
+
+            });
+
+        /* ---------------------------------- */
+        /* --- 7. Sun Locator Logic --- */
+        /* ---------------------------------- */
+        const latInput = document.getElementById('latitude');
+        const lonInput = document.getElementById('longitude');
+        const dateInput = document.getElementById('date');
+        const calcSunBtn = document.getElementById('calc-sun-btn');
+        const useLocationBtn = document.getElementById('use-location-btn');
+        const sunResults = document.getElementById('sun-locator-results');
+        
+        // Set default date to today
+        dateInput.valueAsDate = new Date();
+
+        useLocationBtn.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                useLocationBtn.textContent = 'Locating...';
+                navigator.geolocation.getCurrentPosition(position => {
+                    latInput.value = position.coords.latitude.toFixed(4);
+                    lonInput.value = position.coords.longitude.toFixed(4);
+                    useLocationBtn.textContent = 'Use My Location';
+                    calculateSunTimes();
+                }, () => {
+                    alert('Unable to retrieve your location.');
+                    useLocationBtn.textContent = 'Use My Location';
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        });
+        
+        calcSunBtn.addEventListener('click', calculateSunTimes);
+        
+        function calculateSunTimes() {
+            const lat = parseFloat(latInput.value);
+            const lon = parseFloat(lonInput.value);
+            const date = new Date(dateInput.value);
+            
+            if (isNaN(lat) || isNaN(lon)) {
+                alert('Please enter valid latitude and longitude.');
+                return;
+            }
+            
+            const times = SunCalc.getTimes(date, lat, lon);
+            
+            const formatTime = (dateObj) => dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            sunResults.style.display = 'grid';
+            sunResults.innerHTML = `
+                <div class="result-item"><div class="label">Sunrise</div><div class="value">${formatTime(times.sunrise)}</div></div>
+                <div class="result-item"><div class="label">Sunset</div><div class="value">${formatTime(times.sunset)}</div></div>
+                <div class="result-item"><div class="label">Solar Noon</div><div class="value">${formatTime(times.solarNoon)}</div></div>
+                <div class="result-item"><div class="label">Dawn</div><div class="value">${formatTime(times.dawn)}</div></div>
+                <div class="result-item"><div class="label">Dusk</div><div class="value">${formatTime(times.dusk)}</div></div>
+                <div class="result-item"><div class="label">Golden Hour End</div><div class="value">${formatTime(times.goldenHour)}</div></div>
+            `;
+        }
+
+        /* ---------------------------------- */
+        /* --- 8. Astronomical Calendar --- */
+        /* ---------------------------------- */
+        const calendarData = [
+            { date: '2025-10-17', title: 'Orionid Meteor Shower Peak', description: 'The Orionids are known for their bright and fast meteors. Look towards the constellation of Orion after midnight.' },
+            { date: '2025-11-06', title: 'Full Beaver Moon', description: 'The November full moon, named after beavers preparing for winter. A great opportunity for moon photography.' },
+            { date: '2025-11-17', title: 'Leonid Meteor Shower Peak', description: 'The Leonids are a major shower that can produce spectacular meteor storms in rare peak years.' },
+            { date: '2025-12-14', title: 'Geminid Meteor Shower Peak', description: 'Often the best meteor shower of the year, the Geminids are bright and plentiful, visible all night long.' },
+            { date: '2025-12-21', title: 'December Solstice', description: 'The shortest day of the year in the Northern Hemisphere, marking the official start of winter.' },
+            { date: '2026-01-03', title: 'Quadrantid Meteor Shower Peak', description: 'A short but intense meteor shower, best viewed from the Northern Hemisphere in the dark hours before dawn.' }
+        ];
+
+        const calendarList = document.getElementById('calendar-list');
+        calendarData.forEach(event => {
+            const eventDate = new Date(event.date);
+            const month = eventDate.toLocaleString('default', { month: 'short' }).toUpperCase();
+            const day = eventDate.getDate();
+            
+            const eventElement = document.createElement('div');
+            eventElement.className = 'calendar-event';
+            eventElement.innerHTML = `
+                <div class="event-date">
+                    <div class="month">${month}</div>
+                    <div class="day">${day}</div>
+                </div>
+                <div class="event-details">
+                    <h3>${event.title}</h3>
+                    <p>${event.description}</p>
+                </div>
+            `;
+            calendarList.appendChild(eventElement);
+        });
+        
+    }); // End DOMContentLoaded
+    </script>
+    
+    <script>
+    /*
+     SunCalc is a tiny BSD-licensed JavaScript library for calculating sun position,
+     sunlight phases (times for sunrise, sunset, dusk, etc.),
+     moon position and lunar phase for the given location and time,
+     created by Vladimir Agafonkin (@mourner) as a part of the SunCalc.net project.
+    */
+    (function(){'use strict';function f(a,b){return a-"number"===typeof a?a:new Date(a,b||0,1,-a.getTimezoneOffset()/60)}var g="undefined"!==typeof exports&&"undefined"!==typeof module,k=Math.PI,t=k/180,w=Math.sin,D=Math.cos,E=Math.tan,u=Math.asin,B=Math.atan2,F=Math.acos,G={};f.prototype={set:function(a,b){var c=this.valueOf();for(b=b?b.split(" "):"FullYear Month Date Hours Minutes Seconds Milliseconds".split(" ");a&&b.length;)c["set"+b.shift()](a.shift());return this},add:function(a,b){var c=this.valueOf();for(b=b?b.split(" "):"Milliseconds Seconds Minutes Hours Date Month FullYear".split(" ");a&&b.length;)c["set"+b.shift()](c["get"+b.shift()]()+a.shift());return this}};g?(module.exports=G,G.version="1.8.0"):"function"===typeof define&&define.amd?define(G):window.SunCalc=G;var n=G.times=[[-.833,"sunrise","sunset"],[-.3,"sunriseEnd","sunsetStart"],[-6,"dawn","dusk"],[-12,"nauticalDawn","nauticalDusk"],[-18,"nightEnd","night"],
+    [6,"goldenHourEnd","goldenHour"]],e=G.positions={sunrise:0,sunset:0},I=G.moontimes=[];G.addTime=function(a,b,c){n.push([a,b,c])};G.addMoonTime=function(a,b,c){I.push([a,b,c])};var v=2451545,y=t*23.4397;G.getPosition=function(a,b,c){var l=a-new Date("2000/1/1 12:00 UTC")|0,m=(v-2451545-.5+l)/-25505.5,e=t*(280.46+360.98564737*l);l=t*(357.5291+356.04712*m);var p=e+t*1.9148*w(l)+t*.02*w(2*l),h=y,q=t*b;b=t*c;c=p-t*102.9372;e=u(w(h)*w(p));h=B(D(h)*w(p),D(p));c=B(w(c),
+    D(c)*D(b)-E(q)*w(b));return{azimuth:B(w(h),D(h)*w(q)-E(e)*D(q)),altitude:u(w(q)*w(e)+D(q)*D(e)*D(h))}};G.getTimes=function(a,b,c){a=new f(a);a.set([0,0,0,0],"h m s ms");var l=a.valueOf(),m=t*b,p=t*c,h=Math.round((l-(v-2451545-.5))/864E5),q=function(a,b,c){return t*(357.5291+.98560028*a)},g=function(a,b){var c=t*(1.9148*w(b)+.02*w(2*b)+3.6E-4*w(3*b));return a+c},x=function(a,b){return a-t*102.9372},k=function(a,b){return u(w(y)*w(b))},H=function(a,b,c){return t*((a-2451545.5-.0009-
+    c/360)/.999999015-h)},C=function(a,b){var c=a+(.0028-5.9E-7*h)*w(b);return c-=(.0014-4.4E-7*h)*w(2*y*2451545.5);c=x(c,y);var e=k(c,y);e=y;var l=E(m)*w(e);c=F((w(t*-.833)-l)/(D(m)*D(e)));return H(v+.0009+(h+c/(2*Math.PI))* .999999015,q(h,p),g(t*(280.4608+.98564736*h),q(h,p)))},r=q(h,p),A=g(t*(280.4608+.98564736*h),r),z=x(A,y),J=k(z,y),r=J;for(var d=C(m,r),s=0;s<n.length;s++){var K=n[s],z=K[0],J=F((w(z*t)-w(m)*w(r))/(D(m)*D(r)));J=d+(J/k)*.999999015;e={};e[K[1]]=
+    new f(l);e[K[2]]=new f(l);e[K[1]].add([Math.round(24*60*(-d-J))],["m"]);e[K[2]].add([Math.round(24*60*(-d+J))],["m"]);G[K[1]]=e[K[1]];G[K[2]]=e[K[2]]}return G};G.getMoonPosition=function(a,b,c){a=a-(new Date("2000/1/1 12:00 UTC")|0);var l=t*b,m=t*c,p=a/25505.5;b=t*(218.316+13.176396*p);var h=t*(134.963+13.064993*p),q=t*(93.272+.0529539*p);a=t*(357.5291+.98560028*p);var g=b+t*6.289*w(h)-t*1.274*w(h-2*a)+t*.658*w(2*h)-t*.214*w(2*h-2*a)-t*.11*w(q);b=u(w(g)*
+    D(y)+D(g)*w(y)*w(q));h=B(w(g)*w(y)-D(g)*D(y)*w(q),D(g)*D(y)*D(q));g=h+a;var k=B(w(g),D(g)*w(l)-E(b)*D(l));return{azimuth:k,altitude:u(w(l)*w(b)+D(l)*D(b)*D(g)),distance:22.25/(3600*u(t*.5181)),parallacticAngle:B(w(k-h),E(l)*D(b)-w(b)*D(k-h))}};G.getMoonIllumination=function(a){a||(a=new Date);var b=G.getPosition(a),c=G.getMoonPosition(a),l=(new Date(a-24E5)-new Date("2000/1/1 12:00 UTC")|0)/25505.5;a=c.distance;b=b.azimuth-c.azimuth;c.altitude-=t*.5181*
+    a/384408;var e=B(D(b),E(c.altitude)),m=F(D(b)*D(c.altitude)),p=1-D(m);return{fraction:p,phase:.5+.5*m*(0>b?-1:1)/k,angle:B(D(b.altitude)*w(c.azimuth-b.azimuth),w(c.altitude)*D(b.altitude)-D(c.altitude)*w(b.altitude)*D(c.azimuth-b.azimuth))}};G.getMoonTimes=function(a,b,c,e){a=new f(a);e||a.set([0,0,0,0],"h m s ms");var l=G.getMoonPosition(a,b,c),m=l.altitude-t*-.125,p,h=m,q=0,g=0,k=0;do p=h,h=(G.getMoonPosition(a.add([q],["h"]),b,c).altitude-t*-.125-m)/
+    q,q=(t*-.125-m)/(h-p),k++,a.add([-q],["h"]);while(2<Math.abs(q)&&24>k);e||(G.moonrise=k<24?a:void 0,G.moonset=void 0,a.add([12],["h"]),l=G.getMoonPosition(a,b,c),m=l.altitude-t*-.125,p=h=m,q=0,g=0,k=0,do p=h,h=(G.getMoonPosition(a.add([q],["h"]),b,c).altitude-t*-.125-m)/q,q=(t*-.125-m)/(h-p),k++,a.add([-q],["h"]);while(2<Math.abs(q)&&24>k),G.moonset=k<24?a:void 0);return G}})();
+
+
+    window.AstroWidget = (function() {
+        let w_mediaRecorder = null;
+        let w_chunks = [];
+        let w_cameraOn = false;
+        let w_ctx = null;
+        let w_isOpen = false;
+
+        function initAudio() {
+            if (!w_ctx) w_ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (w_ctx.state === 'suspended') w_ctx.resume();
+        }
+
+        function toggle() {
+            const overlay = document.getElementById('astro-overlay');
+            w_isOpen = (overlay.style.display === 'flex');
+            
+            if (w_isOpen) {
+                overlay.style.display = 'none';
+                w_isOpen = false;
+            } else {
+                overlay.style.display = 'flex';
+                w_isOpen = true;
+                initAudio();
+            }
+        }
+
+        // Spacebar Listener
+        document.addEventListener('keydown', (e) => {
+            if (w_isOpen && e.code === 'Space' && !e.repeat) {
+                startListening();
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (w_isOpen && e.code === 'Space') {
+                stopListening();
+            }
+        });
+
+        async function toggleCamera() {
+            const video = document.getElementById('w-camera-preview');
+            const btn = document.getElementById('w-vision-btn');
+            if(!w_cameraOn) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                    video.srcObject = stream; video.style.display = 'block';
+                    w_cameraOn = true; btn.classList.add('active');
+                } catch(e) { alert("Camera Denied"); }
+            } else {
+                if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                video.style.display = 'none'; w_cameraOn = false; btn.classList.remove('active');
+            }
+        }
+
+        async function startListening() {
+            initAudio();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                w_mediaRecorder = new MediaRecorder(stream);
+                w_chunks = [];
+                w_mediaRecorder.ondataavailable = e => w_chunks.push(e.data);
+                w_mediaRecorder.onstop = sendData;
+                w_mediaRecorder.start();
+                
+                document.querySelector('.widget-mic').classList.add('listening');
+                document.getElementById('w-status').innerText = "Listening...";
+                playTone(400);
+            } catch(e) { 
+                alert("Microphone Needed."); 
+            }
+        }
+
+        function stopListening() {
+            if(w_mediaRecorder && w_mediaRecorder.state !== 'inactive') w_mediaRecorder.stop();
+            document.querySelector('.widget-mic').classList.remove('listening');
+            document.getElementById('w-status').innerText = "Thinking...";
+            playTone(300);
+        }
+
+        async function sendData() {
+            const blob = new Blob(w_chunks, {type: 'audio/wav'});
+            const formData = new FormData();
+            formData.append("audio_data", blob, "voice.wav");
+
+            if(w_cameraOn) {
+                const vid = document.getElementById('w-camera-preview');
+                const can = document.getElementById('w-snapshot-canvas');
+                can.width = vid.videoWidth; can.height = vid.videoHeight;
+                can.getContext('2d').drawImage(vid, 0, 0);
+                const imgBlob = await new Promise(r => can.toBlob(r, 'image/jpeg'));
+                formData.append("image_data", imgBlob, "frame.jpg");
+            }
+
+            let start = Date.now();
+            
+            fetch('/process_audio', {method: 'POST', body: formData})
+            .then(r => r.json())
+            .then(d => {
+                let lat = (Date.now() - start)/1000;
+                document.getElementById('w-latency').innerText = lat.toFixed(2) + 's';
+                
+                if(d.error) {
+                    document.getElementById('w-status').innerText = "Error";
+                    return;
+                }
+
+                document.getElementById('w-status').innerText = "Speaking...";
+                
+                if(d.sonification_data?.length > 0) {
+                    playMusic(d.sonification_data, () => { 
+                        if(d.audio_base64) playAudio(d.audio_base64); 
+                    });
+                } else if(d.audio_base64) {
+                    playAudio(d.audio_base64);
+                }
+            })
+            .catch(e => {
+                console.error("Network Error:", e);
+                document.getElementById('w-status').innerText = "Offline?";
+            });
+        }
+
+        function playTone(f) {
+            if(!w_ctx) return;
+            const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+            o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(w_ctx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.1); o.stop(w_ctx.currentTime+0.1);
+        }
+        
+        function playMusic(d, cb) {
+            let i=0; 
+            let iv = setInterval(() => {
+                if(i>=d.length) { clearInterval(iv); cb(); return; }
+                const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+                o.type='triangle'; o.frequency.value=200+(d[i]*6); o.connect(g); g.connect(w_ctx.destination);
+                o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.15); o.stop(w_ctx.currentTime+0.15);
+                i++;
+            }, 120);
+        }
+        
+        function playAudio(b64) {
+            const a = new Audio("data:audio/mp3;base64,"+b64);
+            a.play();
+            a.onended = () => { document.getElementById('w-status').innerText = "Ready"; };
+        }
+
+        return { toggle, toggleCamera, startListening, stopListening };
+    })();
+    </script>
+</body>
+</html>
