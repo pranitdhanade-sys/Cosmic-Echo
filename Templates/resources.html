@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources - StellerAtlas</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+            1. GLOBAL STYLES & VARIABLES (Stellar Gold & Glassmorphism Theme)
+            ========================================================================== */
+ 
+        :root {
+            --primary-bg: #000000;
+            --glass-bg: rgba(10, 10, 20, 0.55);
+            --border-color: rgba(255, 216, 96, 0.2);
+            --primary-text: #E0E0E0;
+            --heading-text: #FFFFFF;
+            --accent-color: #FFD860; /* A stellar gold */
+            --accent-glow: rgba(255, 216, 96, 0.2);
+            --font-family: 'Montserrat', sans-serif;
+            --max-width: 1200px;
+            --border-radius: 12px;
+            --transition-speed: 0.4s;
+            --transition-fast: 0.3s; /* Added for consistency */
+        }
+
+        /* Basic Reset & Defaults */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Starfield Background */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        /* --- NAVIGATION BAR --- */
+        /* Navigation Bar */
+        nav.navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 40px;
+        }
+
+        .navbar-logo img {
+            height: 80px;
+            width: auto;
+            transition: transform var(--transition-fast), filter var(--transition-fast);
+        }
+
+        .navbar-logo img:hover {
+            transform: scale(1.08);
+            filter: drop-shadow(0 0 8px var(--accent-color));
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar-menu a {
+            color: #ececec;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.04rem;
+            letter-spacing: 0.03em;
+            padding: 8px 15px;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .navbar-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform var(--transition-fast);
+        }
+
+        .navbar-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar-menu a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.active {
+            color: var(--accent-color);
+        }
+
+        .navbar-menu a.active::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.login-btn {
+            background: var(--accent-color);
+    color: var(--dark-bg);
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .navbar-menu a.login-btn:hover {
+            background: #ffed4e;
+            color: var(--dark-bg);
+        }
+
+        .navbar-menu a.login-btn::after {
+            display: none;
+        }
+
+        /* PROFESSIONAL FOOTER STYLES */
+        footer {
+            position: relative;
+            z-index: 5;
+            background: #050505;
+            padding: 80px 40px 20px 40px;
+            border-top: 4px solid var(--accent-color);
+            color: #999;
+        }
+        .footer-container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 50px;
+            margin-bottom: 60px;
+        }
+        .footer-col .logo-footer {
+            height: 50px;
+            margin-bottom: 20px;
+        }
+        .footer-col p {
+            line-height: 1.7;
+            max-width: 300px;
+        }
+        .footer-col h4 {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            color: var(--heading-text);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .footer-col ul {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-col ul li {
+            margin-bottom: 15px;
+        }
+        .footer-col a {
+            text-decoration: none;
+            color: #999;
+            transition: color var(--transition-fast);
+        }
+        .footer-col a:hover {
+            color: var(--accent-color);
+        }
+        .social-icons {
+            display: flex;
+            gap: 15px;
+        }
+        .social-icons a {
+            font-size: 1.2rem;
+            color: #999;
+            background-color: #222;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color var(--transition-fast), color var(--transition-fast);
+        }
+        .social-icons a:hover {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        .newsletter-form {
+            display: flex;
+            margin-top: 10px;
+            max-width: 250px;
+        }
+        .newsletter-form input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #444;
+            background: #222;
+            color: var(--primary-text);
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+        .newsletter-form button {
+            padding: 12px 20px;
+            border: 1px solid var(--accent-color);
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            cursor: pointer;
+            font-weight: 700;
+            border-radius: 0 5px 5px 0;
+            transition: background var(--transition-fast), color var(--transition-fast);
+        }
+        .newsletter-form button:hover {
+            background: #ffedaa;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .footer-bottom-links a {
+            color: #999;
+            text-decoration: none;
+            margin-left: 20px;
+            transition: color var(--transition-fast);
+        }
+        .footer-bottom-links a:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 1024px) {
+            .footer-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        @media (max-width: 600px) {
+            .footer-bottom {
+                flex-direction: column;
+                justify-content: center;
+            }
+        }
+
+
+
+        /* Responsive Typography & Spacing */
+        h1, h2, h3, h4 {
+            line-height: 1.2;
+            font-weight: 600;
+            color: var(--heading-text);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+        h2 { font-size: clamp(2rem, 5vw, 2.8rem); text-align: center; margin-bottom: 3rem; color: var(--accent-color); }
+        h3 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent-color); }
+        h4 { font-size: clamp(1rem, 2vw, 1.25rem); color: var(--primary-text); font-weight: 400; }
+
+        section {
+            padding: clamp(4rem, 8vw, 6rem) clamp(1rem, 5vw, 5rem);
+            position: relative;
+        }
+        
+        /* On-scroll reveal animation */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        /* ==========================================================================
+            2. THE LAUNCHPAD: AI-POWERED SEARCH
+            ========================================================================== */
+        
+        #launchpad {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        #launchpad h1 span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+            animation: fadeInChar 0.5s forwards;
+        }
+
+        @keyframes fadeInChar {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        #launchpad h4 {
+            margin: 1.5rem 0 2.5rem;
+            max-width: 500px;
+        }
+        
+        .ai-search-form {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #ai-search-input {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--primary-text);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all var(--transition-speed) ease;
+        }
+        #ai-search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        
+        #ai-search-btn {
+            display: inline-block;
+            background: var(--accent-color);
+            color: var(--primary-bg);
+            padding: 0.8rem 1.8rem;
+            border: 2px solid var(--accent-color);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            white-space: nowrap;
+        }
+        #ai-search-btn:hover {
+            background: transparent;
+            color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+
+        #ai-results {
+            margin-top: 3rem;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .briefing-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            text-align: left;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        #ai-results.visible .briefing-card {
+             opacity: 1;
+             transform: translateY(0);
+        }
+        
+        .briefing-card ul { list-style: none; margin-top: 1.5rem; padding-left: 0; }
+        .briefing-card li { display: flex; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); }
+        .briefing-card li:last-child { border-bottom: none; }
+        .briefing-card .icon { margin-right: 1rem; color: var(--accent-color); font-size: 1.2rem; }
+
+        /* ==========================================================================
+            3. RESOURCE GRIDS (GLASSMORPHISM STYLE)
+            ========================================================================== */
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .resource-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px var(--accent-glow);
+            border-color: var(--accent-color);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            opacity: 0.8;
+            transition: opacity var(--transition-speed) ease;
+        }
+        
+        .resource-card:hover .card-img {
+            opacity: 1;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+        
+        .card-content h3 {
+            color: var(--heading-text);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        /* ==========================================================================
+            4. MODAL STYLES
+            ========================================================================== */
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0s 0.4s;
+            z-index: 1000;
+        }
+        
+        .modal.active { opacity: 1; visibility: visible; transition: opacity 0.4s ease; }
+        
+        .modal-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            position: relative;
+            width: 90%;
+            height: 90%;
+            max-width: 1000px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transform: scale(0.9);
+            transition: transform 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal.active .modal-content { transform: scale(1); }
+
+        .modal-close {
+            position: absolute; top: 15px; right: 20px; font-size: 2.5rem; color: var(--primary-text); cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease; z-index: 1001;
+        }
+        .modal-close:hover { color: var(--accent-color); transform: rotate(90deg); }
+        
+        #pdf-viewer-content { flex-grow: 1; padding: 2rem; padding-top: 4rem; }
+        #pdf-viewer-content iframe { width: 100%; height: calc(100% - 70px); border: none; border-radius: 6px; }
+        #pdf-download-btn {
+            display: inline-block; background: var(--accent-color); color: var(--primary-bg); padding: 0.8rem 1.8rem;
+            border: 2px solid var(--accent-color); border-radius: 50px; font-weight: 600; transition: all var(--transition-speed) ease;
+            margin-top: 1rem; width: 100%; text-align: center;
+        }
+         #pdf-download-btn:hover { background: transparent; color: var(--accent-color); }
+        
+        #book-modal-content { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 3rem; }
+        #book-modal-title { font-size: clamp(1.5rem, 3vw, 2.5rem); margin-bottom: 2rem; text-align: center; }
+        .purchase-buttons { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        .purchase-btn {
+            display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1.5rem;
+            border: 1px solid var(--border-color); border-radius: 8px; background-color: rgba(0,0,0,0.3);
+            color: var(--primary-text); font-size: 1rem; font-weight: 500; transition: all 0.3s ease;
+        }
+        .purchase-btn:hover { background-color: var(--border-color); color: var(--accent-color); transform: translateY(-3px); }
+        .purchase-btn svg { height: 24px; width: auto; fill: currentColor; }
+
+        /* ==========================================================================
+            5. YOUTUBE CHANNELS
+            ========================================================================== */
+        
+        .youtube-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;
+        }
+        
+        .channel-card {
+            background: var(--glass-bg); border-radius: var(--border-radius); padding: 2rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 1rem; text-align: center; border: 1px solid var(--border-color);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .channel-card:hover {
+            transform: translateY(-10px); box-shadow: 0 10px 20px var(--accent-glow); border-color: var(--accent-color);
+        }
+        
+        .channel-logo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+        .channel-card h4 { color: var(--heading-text); font-weight: 500; }
+        
+        /* ==========================================================================
+            6. COSMIC CHRONICLE TIMELINE (REFINED & IMPROVED)
+            ========================================================================== */
+
+        #cosmic-chronicle { overflow: hidden; }
+        #cosmic-chronicle .container { max-width: 100%; position: relative; }
+
+        /* A subtle line in the center of the viewport to mark the active event */
+        .timeline-centerline {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent-color), transparent);
+            opacity: 0.5;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .timeline-wrapper { height: 100vh; position: relative; width: 100%; }
+        .parallax-bg {
+            position: absolute; top: 0; left: 0; width: 150%; height: 100%;
+            background-image: url('https://www.nasa.gov/wp-content/uploads/2023/12/j2m-shareable.jpg');
+            background-size: cover; background-position: center center; z-index: 0; opacity: 0.7;
+        }
+        .timeline {
+            display: flex; align-items: center; position: relative; height: 70%;
+            padding: 0 50vw; width: max-content; z-index: 2;
+        }
+        .timeline-track {
+            position: absolute; top: 50%; left: 0; width: 100%; height: 2px;
+            background: var(--border-color); transform: translateY(-50%);
+        }
+        .timeline-event {
+            display: flex; flex-direction: column; align-items: center; margin: 0 15vw; position: relative;
+        }
+
+        .event-marker {
+            width: 24px; height: 24px; background-color: var(--primary-bg);
+            border-radius: 50%; border: 3px solid var(--border-color);
+            transition: transform 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+            position: relative;
+        }
+        
+        .timeline-event.is-active .event-marker {
+            border-color: var(--accent-color);
+            transform: scale(1.5);
+            box-shadow: 0 0 20px var(--accent-glow);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 20px rgba(255, 216, 96, 0.2); }
+            50% { box-shadow: 0 0 35px rgba(255, 216, 96, 0.6); }
+            100% { box-shadow: 0 0 20px rgba(255, 216, 96, 0.2); }
+        }
+
+        .event-content {
+            position: absolute; width: 300px; text-align: center;
+            opacity: 0; transform: translateY(10px);
+            transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+        }
+
+        .timeline-event.is-active .event-content { opacity: 1; transform: translateY(0); }
+        .timeline-event:nth-child(odd) .event-content { bottom: 60px; }
+        .timeline-event:nth-child(even) .event-content { top: 60px; }
+        
+        .event-date { font-size: 1.5rem; font-weight: 700; color: var(--accent-color); }
+        .event-title { font-size: 1.2rem; font-weight: 600; margin: 0.5rem 0; color: var(--heading-text); }
+        .event-description { font-size: 0.9rem; color: var(--primary-text); }
+        
+        /* ==========================================================================
+            7. MEDIA QUERIES (RESPONSIVENESS)
+            ========================================================================== */
+        @media (max-width: 768px) {
+            .ai-search-form { flex-direction: column; }
+            .timeline-event { margin: 0 25vw; }
+            .event-content { width: 250px; }
+            .navbar-menu { display: none; } /* Hide menu on smaller screens */
+        }
+        /* Widget CSS */
+    #astro-fab {
+        position: fixed; bottom: 30px; right: 30px; width: 120px; height: 120px;
+        background: #ffd860; color: #000; border: none; border-radius: 50%;
+        font-size: 40px; cursor: pointer; box-shadow: 0 0 20px rgba(255, 216, 96, 0.4);
+        z-index: 9999; transition: transform 0.3s;
+    }
+    #astro-fab:hover { transform: scale(1.1); }
+
+    #astro-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+    }
+    .astro-panel {
+        background: rgba(20, 20, 30, 0.95); border: 2px solid #ffd860; padding: 80px;
+        border-radius: 20px; text-align: center; position: relative; width: 600px;
+        box-shadow: 0 0 50px rgba(255, 216, 96, 0.2);
+    }
+    .astro-panel h2 { color: #fff; margin-bottom: 5px; font-family: sans-serif; }
+    .astro-panel p { color: #ccc; margin-bottom: 30px; font-family: sans-serif; }
+    
+    .widget-mic {
+        width: 100px; height: 100px; margin: 0 auto; background: rgba(255,216,96,0.1);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        border: 2px solid #ffd860; cursor: pointer; position: relative; font-size: 2rem; color: #ffd860;
+    }
+    .widget-mic.listening { box-shadow: 0 0 40px #ffd860; background: #ffd860; color: #000; }
+    
+    .w-vision-btn {
+        width: 100%; padding: 12px; margin-top: 20px; background: transparent;
+        border: 1px solid #ffd860; color: #ffd860; border-radius: 8px; cursor: pointer;
+        font-weight: 700; transition: 0.3s;
+    }
+    .w-vision-btn.active { background: #ffd860; color: #000; }
+    
+    .w-hud { margin-top: 20px; display: flex; justify-content: space-between; font-size: 0.9rem; color: #fff; }
+    .close-widget { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+    
+    #w-camera-preview {
+        position: absolute; top: 20px; right: 20px; width: 120px; border-radius: 10px;
+        border: 2px solid #ffd860; display: none; transform: scaleX(-1);
+    }
+    </style>
+</head>
+<body>
+
+    <canvas id="starfield"></canvas>
+
+    <nav class="navbar">
+        <a href="homepage.html" class="navbar-logo"><img src="mylogo.png" alt="StellerAtlas Logo"></a>
+        <div class="navbar-menu">
+            <a href="homepage.html">HOME</a>
+            <a href="blogpage.html">BLOGS</a>
+            <a href="astronomy.html">ASTRONOMY</a>
+            <a href="resources.html">RESOURCES</a>
+            <a href="community.html">COMMUNITY</a>
+            <a href="missions.html">MISSIONS</a>
+            <a href="pricing.html">PRICING</a>
+
+            <a href="login.html" class="login-btn">LOGIN</a>
+        </div>
+        
+    </nav>
+
+<div id="astro-widget-container">
+    <button id="astro-fab" onclick="window.AstroWidget.toggle()">
+        <i class="fa-solid fa-eye"></i>
+    </button>
+
+    <div id="astro-overlay">
+        <div class="astro-panel">
+            <button class="close-widget" onclick="window.AstroWidget.toggle()">&times;</button>
+            <h2>ASTRO-BRIEF AI</h2>
+            <p>Your Co-Pilot is Ready.</p>
+            
+            <div class="widget-mic" onmousedown="window.AstroWidget.startListening()" onmouseup="window.AstroWidget.stopListening()">
+                <div class="w-mic-ring"></div>
+                <i class="fa-solid fa-microphone"></i>
+            </div>
+            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Hold Spacebar or Click</p>
+
+            <button class="w-vision-btn" id="w-vision-btn" onclick="window.AstroWidget.toggleCamera()">
+                <i class="fa-solid fa-camera"></i> Vision
+            </button>
+
+            <div class="w-hud">
+                <span id="w-status">Ready</span>
+                <span id="w-latency" style="color:#0f0; font-family:monospace;">0.0s</span>
+            </div>
+        </div>
+        <video id="w-camera-preview" autoplay playsinline></video>
+        <canvas id="w-snapshot-canvas" style="display:none;"></canvas>
+    </div>
+</div>
+
+    <section id="launchpad">
+        <h1 id="hero-title">The Resources Launchpad</h1>
+        <h4>Short, concise answers for your cosmic questions.</h4>
+        <form class="ai-search-form" id="ai-search-form">
+            <input type="text" id="ai-search-input" placeholder="e.g., How do black holes form?" autocomplete="off">
+            <button type="submit" id="ai-search-btn">Brief Me</button>
+        </form>
+        <div id="ai-results">
+        </div>
+    </section>
+
+    <main>
+        <section id="research-papers" class="fade-in-section">
+            <div class="container">
+                <h2>Research Papers Archives</h2>
+                <div class="resource-grid" id="papers-grid"></div>
+            </div>
+        </section>
+
+        <section id="books-beginner" class="fade-in-section">
+            <div class="container">
+                <h2>Recommended Books for Beginners</h2>
+                <div class="resource-grid" id="beginner-books-grid"></div>
+            </div>
+        </section>
+
+        <section id="books-amateur" class="fade-in-section">
+            <div class="container">
+                <h2>Recommended Books for Amateur Physicists</h2>
+                <div class="resource-grid" id="amateur-books-grid"></div>
+            </div>
+        </section>
+        
+        <section id="youtube-channels" class="fade-in-section">
+            <div class="container">
+                <h2>Some Great YouTube Channels</h2>
+                <div class="youtube-grid" id="youtube-grid"></div>
+            </div>
+        </section>
+        
+        <section id="cosmic-chronicle" class="fade-in-section">
+            <div class="container">
+                <h2>Cosmic Chronicle</h2>
+                <div class="timeline-centerline"></div>
+                <div class="timeline-wrapper">
+                    <div class="parallax-bg"></div>
+                    <div class="timeline">
+                        <div class="timeline-track"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <div class="modal" id="pdf-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="pdf-modal-close">×</span>
+            <div id="pdf-viewer-content">
+                <iframe id="pdf-iframe" src="" frameborder="0"></iframe>
+                <a href="#" id="pdf-download-btn" download target="_blank">Download PDF</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="book-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="book-modal-close">×</span>
+            <div id="book-modal-content">
+                <h3 id="book-modal-title">Book Title</h3>
+                <div class="purchase-buttons">
+                    <a href="#" id="amazon-link" target="_blank" class="purchase-btn">
+                        <img src="amazon.png" alt="">
+                        <span>Find on Amazon</span>
+                    </a>
+                    <a href="#" id="flipkart-link" target="_blank" class="purchase-btn">
+                        <img src="flip.png" alt="">
+                        <span>Find on Flipkart</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="fade-in-section"> <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="mylogo.png" alt="StellerAtlas Logo" class="logo-footer">
+                    <p>Your one-stop platform for all things space, astrophysics, and astronomy. Explore the cosmos with us.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="#missions">Missions</a></li>
+                        <li><a href="#solar-system">Solar System</a></li>
+                        <li><a href="#gallery">Gallery</a></li>
+                        <li><a href="#news">News</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="#blogs">Blogs</a></li>
+                        <li><a href="#astronomy">Astronomy 101</a></li>
+                        <li><a href="#resources">Resources</a></li>
+                        <li><a href="#">Glossary</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>About</h4>
+                    <ul>
+                        <li><a href="#about">About StellerAtlas</a></li>
+                        <li><a href="#">Our Team</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#community">Community</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Connect</h4>
+                    <div class="social-icons">
+                        <a href="#" aria-label="X (formerly Twitter)"><img src="x.png" alt="X Icon"></a>
+                        <a href="#" aria-label="Instagram"><img src="insta.png" alt="Instagram Icon"></a>
+                        <a href="#" aria-label="YouTube"><img src="yt.png" alt="YouTube Icon"></a>
+                        <a href="#" aria-label="Facebook"><img src="fb.png" alt="Facebook Icon"></a>
+                    </div>
+                    <h4 style="margin-top: 30px;">Newsletter</h4>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="your.email@example.com" required>
+                        <button type="submit">SUB</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CosmicEcho. All Rights Reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+    // ==========================================================================
+    // SCRIPT EXECUTION WRAPPER
+    // ==========================================================================
+    // FIX: All JavaScript is now wrapped in this event listener.
+    // This ensures the script only runs after the page's HTML is fully loaded.
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- Countdown timer for the upcoming events button ---
+        function startCountdown(seconds) {
+            const timerEl = document.getElementById('timer');
+            if (!timerEl) return;
+
+            let timer = seconds;
+
+            const updateTimer = () => {
+                if (timer < 0) {
+                    timerEl.textContent = 'T-00:00:00';
+                    clearInterval(countdownInterval); // Stop the timer when it reaches zero
+                    return;
+                }
+
+                let h = Math.floor(timer / 3600);
+                let m = Math.floor((timer % 3600) / 60);
+                let s = timer % 60;
+
+                timerEl.textContent = `T-${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                timer--;
+            };
+
+            updateTimer(); // Call once immediately so the timer doesn't start blank
+            const countdownInterval = setInterval(updateTimer, 1000);
+        }
+
+        // Set a plausible countdown from the current date for realism
+        const launchTime = new Date('2025-10-14T11:53:00+05:30').getTime();
+        const now = new Date().getTime();
+        const duration = Math.floor((launchTime - now) / 1000);
+        startCountdown(duration > 0 ? duration : 0);
+        
+        // ==========================================================================
+        // 1. STARFIELD CANVAS ANIMATION
+        // ==========================================================================
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const stars = [];
+        const numStars = 250;
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5 + 0.5,
+                alpha: Math.random(),
+                speed: Math.random() * 0.1 + 0.05
+            });
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255, 216, 96, 0.8)'; // Golden stars
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.globalAlpha = star.alpha;
+                ctx.fill();
+                
+                star.y -= star.speed;
+                if (star.y < 0) {
+                    star.y = canvas.height;
+                }
+            });
+            requestAnimationFrame(drawStars);
+        }
+        drawStars();
+        
+        // ==========================================================================
+        // 2. HERO TITLE ANIMATION
+        // ==========================================================================
+        const heroTitle = document.getElementById('hero-title');
+        const text = heroTitle.textContent;
+        heroTitle.innerHTML = '';
+        text.split('').forEach((char, index) => {
+            const span = document.createElement('span');
+            span.textContent = char === ' ' ? '\u00A0' : char; // Handle spaces
+            span.style.animationDelay = `${index * 0.05}s`;
+            heroTitle.appendChild(span);
+        });
+
+        // ==========================================================================
+        // 3. ON-SCROLL FADE-IN ANIMATION
+        // ==========================================================================
+        const sections = document.querySelectorAll('.fade-in-section');
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        sections.forEach(section => { observer.observe(section); });
+
+
+        // ==========================================================================
+        // DATA FOR DYNAMIC CONTENT
+        // ==========================================================================
+        const mockAiResponses = {
+            'black hole': {
+                summary: "A black hole is a region of spacetime where gravity is so strong that nothing—no particles or even electromagnetic radiation such as light—can escape from it. The theory of general relativity predicts that a sufficiently compact mass can deform spacetime to form a black hole. The boundary of no escape is called the event horizon.",
+                resources: [
+                    { icon: '🎬', title: 'How Black Holes Work', source: 'NASA Science' },
+                    { icon: '📄', title: 'Black Holes and Time Warps', source: 'Kip Thorne' },
+                    { icon: '📖', title: 'A Brief History of Time', source: 'Stephen Hawking' }
+                ]
+            },
+            'star formation': {
+                summary: "Star formation is the process by which dense regions within molecular clouds in interstellar space, sometimes referred to as 'stellar nurseries' or 'star-forming regions', collapse and form stars. This process involves the interplay of gravity, gas pressure, magnetic fields, and turbulence.",
+                resources: [
+                    { icon: '🎬', title: 'Pillars of Creation', source: 'Hubble Space Telescope' },
+                    { icon: '📄', title: 'Star Formation in the Era of JWST', source: 'arXiv' },
+                    { icon: '🌐', title: 'Stellar Evolution', source: 'ESA' }
+                ]
+            },
+            'dark matter': {
+                summary: "Dark matter is a hypothetical form of matter thought to account for approximately 85% of the matter in the universe. Its presence is implied in a variety of astrophysical observations, including gravitational effects that cannot be explained by accepted theories of gravity unless more matter is present than can be seen.",
+                resources: [
+                    { icon: '🎬', title: 'The Search for Dark Matter', source: 'Veritasium' },
+                    { icon: '📄', title: 'Review of the Direct Detection of Dark Matter', source: 'Annual Review of Nuclear Science' },
+                    { icon: '🎙️', title: 'StarTalk: Cosmic Queries - Dark Matter', source: 'Neil deGrasse Tyson' }
+                ]
+            },
+             'artemis': {
+                summary: "The Artemis program is a U.S. government-funded international human spaceflight program that has the goal of landing 'the first woman and the next man' on the Moon, specifically at the lunar south pole region, by 2026. It is a stepping stone towards the long-term goal of establishing a sustainable presence on the Moon and eventually sending humans to Mars.",
+                resources: [
+                    { icon: '🌐', title: 'Official Artemis Program Page', source: 'NASA' },
+                    { icon: '🎬', title: 'Artemis I: We Are Going', source: 'NASA Official Video' },
+                    { icon: '📄', title: 'Artemis Program Architecture', source: 'NASA Publications' }
+                ]
+            }
+        };
+
+        const researchPapers = [
+            { title: "First Results from the James Webb Space Telescope", pdf: "https://arxiv.org/pdf/2207.05632.pdf", img: "jwst.png" },
+            { title: "Observation of Gravitational Waves from a Binary Black Hole Merger", pdf: "https://arxiv.org/pdf/1602.03837.pdf", img: "ligo.png" },
+            { title: "A super-Earth-sized planet orbiting in or near the habitable zone of a Sun-like star", pdf: "https://arxiv.org/pdf/1404.7141.pdf", img: "superearth.png" },
+            { title: "Evidence for a Distant Giant Planet in the Solar System", pdf: "https://arxiv.org/pdf/1601.05438.pdf", img: "p9.png" }
+        ];
+        
+        const beginnerBooks = [
+            { title: "Astrophysics for People in a Hurry", img: "aph.png" },
+            { title: "Cosmos by Carl Sagan", img: "cosmos.png" },
+            { title: "The God Equation", img: "tge.png" },
+            { title: "Death by Black Hole", img: "dbh.png" },
+            { title: "Welcome to the Universe", img: "wtu.png" },
+            { title: "Brief Answers to the Big Questions", img: "bab.png" },
+            { title: "The Theory of Everything", img: "tte.png" },
+            { title: "In Search of Schrödinger's Cat", img: "insc.png" },
+            { title: "Relativity: The Special and General Theory", img: "sgt.png" },
+        ];
+
+        const amateurBooks = [
+            { title: "Six Easy Pieces", img: "sep.png" },
+            { title: "Six Not-So-Easy Pieces", img: "snep.png" },
+            { title: "Quantum Drama: The Bohr-Einstein Debate", img: "qd.png" },
+            { title: "Physics of the Impossible", img: "pti.png" },
+            { title: "Mathematical Methods for Physics and Engineering", img: "mmpe.png" },
+            { title: "Fundamentals of Physics", img: "fp.png" },
+            { title: "Concepts in Thermal Physics", img: "ctp.png" },
+            { title: "The Feynman Lectures on Physics (3-Book Series)", img: "flp.png" }
+        ];
+
+        const youtubeChannels = [
+            { name: 'Veritasium', logo: 'veri.png', link: 'https://www.youtube.com/@Veritasium' },
+            { name: 'Vsauce', logo: 'vsauce.png', link: 'https://www.youtube.com/@Vsauce' },
+            { name: 'StarTalk', logo: 'startalk.png', link: 'https://www.youtube.com/@startalk' },
+            { name: 'Cleo Abram', logo: 'cleo.png', link: 'https://www.youtube.com/@CleoAbram' },
+            { name: 'Astro Kobi', logo: 'astro.png', link: 'https://www.youtube.com/@astrokobi' },
+            { name: 'NASA', logo: 'nasa.png', link: 'https://www.youtube.com/@NASA' },
+            { name: 'SpaceX', logo: 'spacex.png', link: 'https://www.youtube.com/@spacex' },
+            { name: 'ISRO', logo: 'isro.png', link: 'https://www.youtube.com/@isroofficial5866' },
+            { name: 'Kurzgesagt', logo: 'kurz.png', link: 'https://www.youtube.com/@kurzgesagt' }
+        ];
+
+        const timelineEvents = [
+            { date: "13.8 BYA", title: "The Big Bang", description: "The universe begins from a hot, dense singularity. The start of spacetime itself." },
+            { date: "13.6 BYA", title: "First Stars & Galaxies", description: "Gravity pulls matter together, forming the first stars and infant galaxies." },
+            { date: "4.6 BYA", title: "Solar System Forms", description: "Our sun, Earth, and neighboring planets form from a rotating cloud of gas and dust." },
+            { date: "1687", title: "Newton's Principia", description: "Isaac Newton publishes his laws of motion and universal gravitation, revolutionizing physics." },
+            { date: "1915", title: "General Relativity", description: "Albert Einstein publishes his theory of general relativity, describing gravity as a curvature of spacetime." },
+            { date: "1957", title: "Sputnik 1", description: "The Soviet Union launches the first artificial satellite, kicking off the Space Race." },
+            { date: "1969", title: "Apollo 11", description: "NASA's Apollo 11 mission lands the first humans on the Moon." },
+            { date: "1977", title: "Voyager Probes Launch", description: "Voyagers 1 and 2 are launched to study the outer planets and interstellar space." },
+            { date: "1990", title: "Hubble Telescope", description: "The Hubble Space Telescope is deployed, providing unprecedented views of the cosmos." },
+            { date: "2021", title: "JWST Launch", description: "The James Webb Space Telescope, Hubble's successor, is launched to peer back toward the beginning of time." }
+        ];
+        
+
+        // ==========================================================================
+        // LAUNCHPAD AI SEARCH FUNCTIONALITY
+        // ==========================================================================
+        const searchForm = document.getElementById('ai-search-form');
+        const searchInput = document.getElementById('ai-search-input');
+        const resultsContainer = document.getElementById('ai-results');
+
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = searchInput.value.toLowerCase();
+            resultsContainer.classList.remove('visible');
+
+            setTimeout(() => {
+                let response = null;
+                for (const key in mockAiResponses) {
+                    if (query.includes(key)) {
+                        response = mockAiResponses[key];
+                        break;
+                    }
+                }
+                displayResults(response);
+            }, 500);
+        });
+
+        function displayResults(data) {
+            let html = '';
+            if (data) {
+                html = `
+                    <div class="briefing-card">
+                        <h3>AI Summary</h3>
+                        <p>${data.summary}</p>
+                        <h3>Top Resources</h3>
+                        <ul>
+                            ${data.resources.map(res => `<li><span class="icon">${res.icon}</span> <span><strong>${res.title}</strong> - <i>${res.source}</i></span></li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="briefing-card">
+                        <h3>No Results Found</h3>
+                        <p>Our AI could not find a direct answer. Please try rephrasing your question or exploring our resources below.</p>
+                    </div>
+                `;
+            }
+            resultsContainer.innerHTML = html;
+            resultsContainer.classList.add('visible');
+        }
+
+        // ==========================================================================
+        // DYNAMIC CONTENT POPULATION & MODAL LOGIC
+        // ==========================================================================
+        const papersGrid = document.getElementById('papers-grid');
+        const beginnerBooksGrid = document.getElementById('beginner-books-grid');
+        const amateurBooksGrid = document.getElementById('amateur-books-grid');
+        const youtubeGrid = document.getElementById('youtube-grid');
+        const timelineContainer = document.querySelector('.timeline');
+        
+        function populateGrid(container, items, type) {
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'resource-card';
+                card.innerHTML = `
+                    <img src="${item.img}" alt="${item.title}" class="card-img" loading="lazy">
+                    <div class="card-content">
+                        <h3>${item.title}</h3>
+                    </div>
+                `;
+                if (type === 'paper') {
+                    card.dataset.pdfSrc = item.pdf;
+                    card.dataset.title = item.title;
+                    card.addEventListener('click', openPdfModal);
+                } else if (type === 'book') {
+                    card.dataset.title = item.title;
+                    card.addEventListener('click', openBookModal);
+                }
+                container.appendChild(card);
+            });
+        }
+        
+        populateGrid(papersGrid, researchPapers, 'paper');
+        populateGrid(beginnerBooksGrid, beginnerBooks, 'book');
+        populateGrid(amateurBooksGrid, amateurBooks, 'book');
+        
+        youtubeChannels.forEach(channel => {
+            const link = document.createElement('a');
+            link.href = channel.link;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.innerHTML = `
+                <div class="channel-card">
+                    <img src="${channel.logo}" alt="${channel.name} Logo" class="channel-logo" loading="lazy">
+                    <h4>${channel.name}</h4>
+                </div>
+            `;
+            youtubeGrid.appendChild(link);
+        });
+        
+        timelineEvents.forEach(event => {
+            const eventEl = document.createElement('div');
+            eventEl.className = 'timeline-event';
+            eventEl.innerHTML = `
+                <div class="event-marker"></div>
+                <div class="event-content">
+                    <div class="event-date">${event.date}</div>
+                    <div class="event-title">${event.title}</div>
+                    <p class="event-description">${event.description}</p>
+                </div>
+            `;
+            timelineContainer.appendChild(eventEl);
+        });
+
+        // --- Modal Functionality ---
+
+        const pdfModal = document.getElementById('pdf-modal');
+        const bookModal = document.getElementById('book-modal');
+        
+        function openPdfModal(e) {
+            const card = e.currentTarget;
+            document.getElementById('pdf-iframe').src = card.dataset.pdfSrc;
+            document.getElementById('pdf-download-btn').href = card.dataset.pdfSrc;
+            pdfModal.classList.add('active');
+        }
+
+        function openBookModal(e) {
+            const card = e.currentTarget;
+            const title = card.dataset.title;
+            document.getElementById('book-modal-title').textContent = title;
+            const amazonQuery = encodeURIComponent(`${title} book`);
+            const flipkartQuery = encodeURIComponent(`${title}`);
+            document.getElementById('amazon-link').href = `https://www.amazon.in/s?k=${amazonQuery}`;
+            document.getElementById('flipkart-link').href = `https://www.flipkart.com/search?q=${flipkartQuery}`;
+            bookModal.classList.add('active');
+        }
+        
+        document.querySelectorAll('.modal-close, .modal').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if(e.target === e.currentTarget) {
+                    pdfModal.classList.remove('active');
+                    bookModal.classList.remove('active');
+                    document.getElementById('pdf-iframe').src = "";
+                }
+            });
+        });
+
+        // ==========================================================================
+        // GSAP COSMIC CHRONICLE TIMELINE ANIMATION
+        // ==========================================================================
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // A brief delay to ensure all dynamic content has rendered and has a width
+        setTimeout(() => {
+            const timeline = document.querySelector('.timeline');
+            if (timeline.offsetWidth > window.innerWidth) { // Only run if timeline is scrollable
+                const timelineEventsArr = gsap.utils.toArray('.timeline-event');
+                
+                let tween = gsap.to(timeline, {
+                    xPercent: -100 * (timeline.offsetWidth - window.innerWidth) / timeline.offsetWidth,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: "#cosmic-chronicle",
+                        pin: true,
+                        scrub: 1,
+                        end: () => "+=" + (timeline.offsetWidth - window.innerWidth),
+                    }
+                });
+
+                gsap.to(".parallax-bg", {
+                    x: () => - (document.querySelector('.parallax-bg').offsetWidth - window.innerWidth),
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: "#cosmic-chronicle",
+                        scrub: 1.5,
+                        end: () => "+=" + (timeline.offsetWidth - window.innerWidth)
+                    }
+                });
+                
+                timelineEventsArr.forEach(event => {
+                    ScrollTrigger.create({
+                        trigger: event,
+                        containerAnimation: tween,
+                        start: "center center",
+                        end: "center 20%",
+                        toggleClass: { targets: event, className: "is-active" },
+                    });
+                });
+            }
+        }, 100); // 100ms delay is usually enough
+
+    });
+    window.AstroWidget = (function() {
+        let w_mediaRecorder = null;
+        let w_chunks = [];
+        let w_cameraOn = false;
+        let w_ctx = null; 
+        let w_isOpen = false; // Track if widget is open
+
+        function initAudio() {
+            if (!w_ctx) w_ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (w_ctx.state === 'suspended') w_ctx.resume();
+        }
+
+        function toggle() {
+            const overlay = document.getElementById('astro-overlay');
+            w_isOpen = (overlay.style.display === 'flex');
+            
+            if (w_isOpen) {
+                overlay.style.display = 'none';
+                w_isOpen = false;
+            } else {
+                overlay.style.display = 'flex';
+                w_isOpen = true;
+                initAudio();
+            }
+        }
+
+        // --- SPACEBAR LISTENER FOR WIDGET ---
+        document.addEventListener('keydown', (e) => {
+            // Only activate if widget is OPEN and space is pressed
+            if (w_isOpen && e.code === 'Space' && !e.repeat) {
+                startListening();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (w_isOpen && e.code === 'Space') {
+                stopListening();
+            }
+        });
+        // -------------------------------------
+
+        async function toggleCamera() {
+            const video = document.getElementById('w-camera-preview');
+            const btn = document.getElementById('w-vision-btn');
+            if (!w_cameraOn) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                    video.srcObject = stream; video.style.display = 'block';
+                    w_cameraOn = true; btn.classList.add('active');
+                } catch(e) { alert("Camera Permission Denied"); }
+            } else {
+                if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                video.style.display = 'none'; w_cameraOn = false; btn.classList.remove('active');
+            }
+        }
+
+        async function startListening() {
+            initAudio();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                w_mediaRecorder = new MediaRecorder(stream);
+                w_chunks = [];
+                w_mediaRecorder.ondataavailable = e => w_chunks.push(e.data);
+                w_mediaRecorder.onstop = sendData;
+                w_mediaRecorder.start();
+                
+                document.querySelector('.widget-mic').classList.add('listening');
+                document.getElementById('w-status').innerText = "Listening...";
+                playTone(400);
+            } catch(e) { 
+                alert("Microphone Needed."); 
+            }
+        }
+
+        function stopListening() {
+            if(w_mediaRecorder && w_mediaRecorder.state !== 'inactive') w_mediaRecorder.stop();
+            document.querySelector('.widget-mic').classList.remove('listening');
+            document.getElementById('w-status').innerText = "Thinking...";
+            playTone(300);
+        }
+
+        async function sendData() {
+            const blob = new Blob(w_chunks, {type: 'audio/wav'});
+            const formData = new FormData();
+            formData.append("audio_data", blob, "voice.wav");
+
+            if(w_cameraOn) {
+                const vid = document.getElementById('w-camera-preview');
+                const can = document.getElementById('w-snapshot-canvas');
+                can.width = vid.videoWidth; can.height = vid.videoHeight;
+                can.getContext('2d').drawImage(vid, 0, 0);
+                const imgBlob = await new Promise(r => can.toBlob(r, 'image/jpeg'));
+                formData.append("image_data", imgBlob, "frame.jpg");
+            }
+
+            let start = Date.now();
+            fetch('/process_audio', {method: 'POST', body: formData})
+            .then(r => r.json())
+            .then(d => {
+                let lat = (Date.now() - start)/1000;
+                document.getElementById('w-latency').innerText = lat.toFixed(2) + 's';
+                document.getElementById('w-status').innerText = "Speaking...";
+                
+                if(d.sonification_data?.length > 0) {
+                    playMusic(d.sonification_data, () => { if(d.audio_base64) playAudio(d.audio_base64); });
+                } else if(d.audio_base64) {
+                    playAudio(d.audio_base64);
+                }
+            })
+            .catch(e => { console.error(e); document.getElementById('w-status').innerText = "Offline?"; });
+        }
+
+        function playTone(f) {
+            if(!w_ctx) return;
+            const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+            o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(w_ctx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.1); o.stop(w_ctx.currentTime+0.1);
+        }
+        function playMusic(d, cb) {
+            let i=0; let iv = setInterval(() => {
+                if(i>=d.length) { clearInterval(iv); cb(); return; }
+                const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+                o.type='triangle'; o.frequency.value=200+(d[i]*6); o.connect(g); g.connect(w_ctx.destination);
+                o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.15); o.stop(w_ctx.currentTime+0.15);
+                i++;
+            }, 120);
+        }
+        function playAudio(b64) {
+            new Audio("data:audio/mp3;base64,"+b64).play();
+        }
+
+        return { toggle, toggleCamera, startListening, stopListening };
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Missions - StellerAtlas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    /* --- GLOBAL STYLES & VARIABLES --- */
+    :root {
+      --primary-color: #ffffff;
+      --accent-color: #ffd860;
+      --dark-bg: #000000;
+      --semi-dark-bg: rgba(10, 10, 10, 0.7);
+      --font-primary: 'Montserrat', Arial, sans-serif;
+      --transition-fast: 0.3s ease;
+      --transition-med: 0.5s ease;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap');
+
+    body {
+      margin: 0; padding: 0; min-height: 100vh;
+      font-family: var(--font-primary);
+      background: var(--dark-bg);
+      color: var(--primary-color);
+      overflow-x: hidden;
+      position: relative;
+    } 
+
+    /* --- BACKGROUND ELEMENTS --- */
+    video#bg-video {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      object-fit: cover; z-index: -2; pointer-events: none; filter: brightness(0.6);
+    }
+    canvas#star-field {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: -1; pointer-events: none;
+    }
+
+    /* --- NAVIGATION BAR --- */
+    /* Navigation Bar */
+        nav.navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 40px;
+        }
+
+        .navbar-logo img {
+            height: 80px;
+            width: auto;
+            transition: transform var(--transition-fast), filter var(--transition-fast);
+        }
+
+        .navbar-logo img:hover {
+            transform: scale(1.08);
+            filter: drop-shadow(0 0 8px var(--accent-color));
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar-menu a {
+            color: #ececec;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.04rem;
+            letter-spacing: 0.03em;
+            padding: 8px 15px;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .navbar-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform var(--transition-fast);
+        }
+
+        .navbar-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar-menu a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.active {
+            color: var(--accent-color);
+        }
+
+        .navbar-menu a.active::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.login-btn {
+            background: var(--accent-color);
+            color: var(--dark-bg);
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .navbar-menu a.login-btn:hover {
+            background: #ffed4e;
+            color: var(--dark-bg);
+        }
+
+        .navbar-menu a.login-btn::after {
+            display: none;
+        }
+
+    /* --- SECTIONS --- */
+    .content-section {
+      position: relative;
+      z-index: 5;
+      max-width: 1200px;
+      margin: 100px auto;
+      padding: 40px;
+      background: rgba(10, 15, 25, 0.65);
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    .content-section h2 {
+      color: var(--accent-color);
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-top: 0;
+      margin-bottom: 40px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.7);
+      text-align: center;
+    }
+    .missions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+    }
+    .mission-card {
+      background: var(--semi-dark-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .mission-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px var(--accent-color);
+    }
+    .card-image-wrapper {
+      overflow: hidden;
+      height: 180px;
+    }
+    .mission-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--transition-med);
+    }
+    .mission-card:hover img {
+      transform: scale(1.05);
+    }
+    .card-content {
+      padding: 20px 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-grow: 1;
+    }
+    .mission-card h3 {
+      margin: 0 0 12px 0;
+      font-size: 1.4rem;
+      color: var(--primary-color);
+    }
+    .mission-card p {
+      margin: 0 0 18px 0;
+      color: #ccc;
+      line-height: 1.5;
+      flex-grow: 1;
+    }
+    .mission-card button {
+      align-self: flex-start;
+      padding: 10px 24px;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+      border: 2px solid var(--primary-color);
+      background: transparent;
+      color: var(--primary-color);
+      cursor: pointer;
+      border-radius: 7px;
+      transition: all var(--transition-fast);
+      text-shadow: 0 0 4px rgba(0,0,0,0.7);
+    }
+    .mission-card button:hover {
+      background: var(--accent-color);
+      color: var(--dark-bg);
+      border-color: var(--accent-color);
+    }
+    
+    /* Modal full-page overlay styles */
+    #mission-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 5000;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+      animation: zoomFadeIn 0.4s ease forwards;
+    }
+    #mission-modal.is-visible {
+      display: flex;
+    }
+    @keyframes zoomFadeIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    #mission-modal .modal-content {
+      background: var(--semi-dark-bg);
+      border-radius: 16px;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      max-width: 900px;
+      width: 90%;
+      color: var(--primary-color);
+      box-shadow: 0 0 40px var(--accent-color);
+      overflow-y: auto;
+      max-height: 90vh;
+      position: relative;
+    }
+    #mission-modal .modal-close {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-size: 1.8rem;
+      background: none;
+      border: none;
+      color: var(--accent-color);
+      cursor: pointer;
+      font-weight: 700;
+      transition: color 0.3s ease;
+    }
+    #mission-modal .modal-close:hover {
+      color: #fff;
+    }
+    #mission-modal h3 {
+      margin-top: 0;
+      color: var(--accent-color);
+      font-size: 2.2rem;
+    }
+    #mission-modal img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: block;
+      box-shadow: 0 0 20px var(--accent-color);
+    }
+    #mission-modal p {
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+      color: #ddd;
+    }
+    
+    /* Scrollbar for modal overflow */
+    #mission-modal .modal-content::-webkit-scrollbar {
+      width: 10px;
+    }
+    #mission-modal .modal-content::-webkit-scrollbar-thumb {
+      background-color: var(--accent-color);
+      border-radius: 10px;
+    }
+    
+    /* --- SCROLL ANIMATION --- */
+    .fade-up-section {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.65,0,0.35,1), transform 0.8s cubic-bezier(0.65,0,0.35,1);
+    }
+    .fade-up-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* --- RESPONSIVE --- */
+    @media (max-width: 920px) {
+      .missions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+footer {
+  position: relative;
+  z-index: 5;
+  background: #050505;
+  padding: 80px 40px 20px 40px;
+  border-top: 4px solid var(--accent-color);
+  color: #999;
+}
+.footer-container {
+  max-width: 1300px;
+  margin: 0 auto;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, 1fr);
+  gap: 50px;
+  margin-bottom: 60px;
+}
+.footer-col .logo-footer {
+  height: 50px;
+  margin-bottom: 20px;
+}
+.footer-col p {
+  line-height: 1.7;
+  max-width: 300px;
+}
+.footer-col h4 {
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+  color: var(--primary-color);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+}
+.footer-col ul li {
+  margin-bottom: 15px;
+}
+.footer-col a {
+  text-decoration: none;
+  color: #999;
+  transition: color var(--transition-fast);
+}
+.footer-col a:hover {
+  color: var(--accent-color);
+}
+.social-icons {
+  display: flex;
+  gap: 15px;
+}
+.social-icons a {
+  font-size: 1.2rem;
+  color: #999;
+  background-color: #222;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.social-icons a:hover {
+  background-color: var(--accent-color);
+  color: #000;
+}
+.newsletter-form {
+  display: flex;
+  margin-top: 10px;
+  max-width: 250px;
+}
+.newsletter-form input {
+  flex-grow: 1;
+  padding: 12px;
+  border: 1px solid #444;
+  background: #222;
+  color: var(--primary-color);
+  border-radius: 5px 0 0 5px;
+  outline: none;
+}
+.newsletter-form button {
+  padding: 12px 20px;
+  border: 1px solid var(--accent-color);
+  background: var(--accent-color);
+  color: var(--dark-bg);
+  cursor: pointer;
+  font-weight: 700;
+  border-radius: 0 5px 5px 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.newsletter-form button:hover {
+  background: #ffedaa;
+}
+.footer-bottom {
+  text-align: center;
+  padding-top: 30px;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-bottom-links a {
+  color: #999;
+  text-decoration: none;
+  margin-left: 20px;
+  transition: color var(--transition-fast);
+}
+.footer-bottom-links a:hover {
+  color: var(--accent-color);
+}
+
+
+
+
+
+/* Widget CSS */
+    #astro-fab {
+        position: fixed; bottom: 30px; right: 30px; width: 120px; height: 120px;
+        background: #ffd860; color: #000; border: none; border-radius: 50%;
+        font-size: 40px; cursor: pointer; box-shadow: 0 0 20px rgba(255, 216, 96, 0.4);
+        z-index: 9999; transition: transform 0.3s;
+    }
+    #astro-fab:hover { transform: scale(1.1); }
+
+    #astro-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 10000;
+        display: none; align-items: center; justify-content: center;
+    }
+    .astro-panel {
+        background: rgba(20, 20, 30, 0.95); border: 2px solid #ffd860; padding: 80px;
+        border-radius: 20px; text-align: center; position: relative; width: 600px;
+        box-shadow: 0 0 50px rgba(255, 216, 96, 0.2);
+    }
+    .astro-panel h2 { color: #fff; margin-bottom: 5px; font-family: sans-serif; }
+    .astro-panel p { color: #ccc; margin-bottom: 30px; font-family: sans-serif; }
+    
+    .widget-mic {
+        width: 100px; height: 100px; margin: 0 auto; background: rgba(255,216,96,0.1);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        border: 2px solid #ffd860; cursor: pointer; position: relative; font-size: 2rem; color: #ffd860;
+    }
+    .widget-mic.listening { box-shadow: 0 0 40px #ffd860; background: #ffd860; color: #000; }
+    
+    .w-vision-btn {
+        width: 100%; padding: 12px; margin-top: 20px; background: transparent;
+        border: 1px solid #ffd860; color: #ffd860; border-radius: 8px; cursor: pointer;
+        font-weight: 700; transition: 0.3s;
+    }
+    .w-vision-btn.active { background: #ffd860; color: #000; }
+    
+    .w-hud { margin-top: 20px; display: flex; justify-content: space-between; font-size: 0.9rem; color: #fff; }
+    .close-widget { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+    
+    #w-camera-preview {
+        position: absolute; top: 20px; right: 20px; width: 120px; border-radius: 10px;
+        border: 2px solid #ffd860; display: none; transform: scaleX(-1);
+    }
+
+
+
+
+
+/* Responsive footer adjustments can be added similarly */
+
+    
+  </style>
+</head>
+<body>
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="bg.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+  <canvas id="star-field"></canvas>
+
+  <nav class="navbar">
+    <a href="homepage.html" class="navbar-logo">
+      <img src="mylogo.png" alt="Astrophysics Explorer Logo" />
+    </a>
+    <div class="navbar-menu">
+      <a href="homepage.html">HOME</a>
+<a href="blogpage.html">BLOGS</a>
+<a href="astronomy.html">ASTRONOMY</a>
+<a href="resources.html">RESOURCES</a>
+<a href="community.html">COMMUNITY</a>
+<a href="missions.html">MISSIONS</a>
+<a href="pricing.html">PRICING</a>
+<a href="login.html" class="login-btn">LOGIN</a>
+    </div>
+    
+  </nav>
+<div id="astro-widget-container">
+    <button id="astro-fab" onclick="window.AstroWidget.toggle()">
+        <i class="fa-solid fa-eye"></i>
+    </button>
+
+    <div id="astro-overlay">
+        <div class="astro-panel">
+            <button class="close-widget" onclick="window.AstroWidget.toggle()">&times;</button>
+            <h2>ASTRO-BRIEF AI</h2>
+            <p>Your Co-Pilot is Ready.</p>
+            
+            <div class="widget-mic" onmousedown="window.AstroWidget.startListening()" onmouseup="window.AstroWidget.stopListening()">
+                <div class="w-mic-ring"></div>
+                <i class="fa-solid fa-microphone"></i>
+            </div>
+            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Hold Spacebar or Click</p>
+
+            <button class="w-vision-btn" id="w-vision-btn" onclick="window.AstroWidget.toggleCamera()">
+                <i class="fa-solid fa-camera"></i> Vision
+            </button>
+
+            <div class="w-hud">
+                <span id="w-status">Ready</span>
+                <span id="w-latency" style="color:#0f0; font-family:monospace;">0.0s</span>
+            </div>
+        </div>
+        <video id="w-camera-preview" autoplay playsinline></video>
+        <canvas id="w-snapshot-canvas" style="display:none;"></canvas>
+    </div>
+</div>
+  <main>
+    <section id="past-missions" class="content-section fade-up-section" aria-label="Past Space Missions">
+      <h2>Past Missions</h2>
+      <div class="missions-grid">
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="apollo.png" alt="Apollo Moon Missions" /></div>
+          <div class="card-content">
+            <h3>Apollo Moon Missions</h3>
+            <p>Historic missions that first landed humans on the Moon, paving way for future exploration.</p>
+            <button class="learn-more" data-mission="apollo">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="voyager.png" alt="Voyager Probes" /></div>
+          <div class="card-content">
+            <h3>Voyager Probes</h3>
+            <p>Explored outer planets and continue to send data from interstellar space beyond the Solar System.</p>
+            <button class="learn-more" data-mission="voyager">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="pioneer.png" alt="Pioneer Missions" /></div>
+          <div class="card-content">
+            <h3>Pioneer Missions</h3>
+            <p>Provided first detailed data on Jupiter and Saturn, expanding solar system knowledge.</p>
+            <button class="learn-more" data-mission="pioneer">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="mariner.png" alt="Mariner Missions" /></div>
+          <div class="card-content">
+            <h3>Mariner Missions</h3>
+            <p>First missions to fly by and orbit Mars, Venus, and Mercury gathering pioneering data.</p>
+            <button class="learn-more" data-mission="mariner">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="magellan.png" alt="Magellan Probe" /></div>
+          <div class="card-content">
+            <h3>Magellan Probe</h3>
+            <p>Mapped the surface of Venus in high resolution radar, revealing geological features.</p>
+            <button class="learn-more" data-mission="magellan">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="galileo.png" alt="Galileo Jupiter Orbiter" /></div>
+          <div class="card-content">
+            <h3>Galileo Jupiter Orbiter</h3>
+            <p>Delivered extensive observations of Jupiter and its moons during its 8-year mission.</p>
+            <button class="learn-more" data-mission="galileo">Learn More</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="present-missions" class="content-section fade-up-section" aria-label="Present Space Missions">
+      <h2>Present Missions</h2>
+      <div class="missions-grid">
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="juno.png" alt="Juno Jupiter Mission" /></div>
+          <div class="card-content">
+            <h3>Juno Jupiter Mission</h3>
+            <p>Studying Jupiter's atmosphere, magnetic field, and gravity to understand planetary origins.</p>
+            <button class="learn-more" data-mission="juno">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="pres.png" alt="Mars Perseverance Rover" /></div>
+          <div class="card-content">
+            <h3>Mars Perseverance Rover</h3>
+            <p>Exploring Mars for signs of past microbial life and collecting samples for future return.</p>
+            <button class="learn-more" data-mission="perseverance">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="jwst.png" alt="James Webb Space Telescope" /></div>
+          <div class="card-content">
+            <h3>James Webb Space Telescope</h3>
+            <p>Leading space observatory exploring the earliest stars and galaxies of the Universe.</p>
+            <button class="learn-more" data-mission="jwst">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="chand.png" alt="Chandrayaan 3" /></div>
+          <div class="card-content">
+            <h3>Chandrayaan 3 Mission</h3>
+            <p>India’s orbiter, lander, and rover exploring Moon' surface, atmosphere, and geology.</p>
+            <button class="learn-more" data-mission="tianwen">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="helicopter.png" alt="Ingenuity Helicopter" /></div>
+          <div class="card-content">
+            <h3>Ingenuity Helicopter</h3>
+            <p>First powered, controlled flight on Mars as a technology demonstration.</p>
+            <button class="learn-more" data-mission="ingenuity">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="oris.png" alt="OSIRIS-REx Asteroid Mission" /></div>
+          <div class="card-content">
+            <h3>OSIRIS-REx Asteroid Mission</h3>
+            <p>Collected and returning samples from asteroid Bennu to study our solar system’s origins.</p>
+            <button class="learn-more" data-mission="osiris">Learn More</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="future-missions" class="content-section fade-up-section" aria-label="Future Space Missions">
+      <h2>Future Missions</h2>
+      <div class="missions-grid">
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="artemis.png" alt="Artemis Moon Missions" /></div>
+          <div class="card-content">
+            <h3>Artemis Moon Missions</h3>
+            <p>Returning humans to the Moon, establishing a sustainable presence for future explorations.</p>
+            <button class="learn-more" data-mission="artemis">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="dragonfly.png" alt="Dragonfly Titan Mission" /></div>
+          <div class="card-content">
+            <h3>Dragonfly Titan Mission</h3>
+            <p>Rotorcraft mission to explore Titan’s surface chemistry and habitability.</p>
+            <button class="learn-more" data-mission="dragonfly">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="exomars.png" alt="ExoMars Mission" /></div>
+          <div class="card-content">
+            <h3>ExoMars Mission</h3>
+            <p>European-Russian rover and orbiter searching for biosignatures on Mars.</p>
+            <button class="learn-more" data-mission="exomars">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="interstellar.png" alt="Interstellar Probe" /></div>
+          <div class="card-content">
+            <h3>Interstellar Probe</h3>
+            <p>Concept probe to explore the boundary of the heliosphere and interstellar space.</p>
+            <button class="learn-more" data-mission="interstellar">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="icemapper.png" alt="Mars Ice Mapper" /></div>
+          <div class="card-content">
+            <h3>Mars Ice Mapper</h3>
+            <p>Orbiter mission to locate and characterize water ice on Mars for future human explorers.</p>
+            <button class="learn-more" data-mission="ice-mapper">Learn More</button>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="card-image-wrapper"><img src="lpe.png" alt="Lunar Polar Exploration" /></div>
+          <div class="card-content">
+            <h3>Lunar Polar Exploration</h3>
+            <p>Future robotic missions to explore volatiles and geology of the Moon's polar regions.</p>
+            <button class="learn-more" data-mission="lunar-polar">Learn More</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal for mission details -->
+  <div id="mission-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+    <div class="modal-content" tabindex="0">
+      <button class="modal-close" aria-label="Close mission details">&times;</button>
+      <h3 id="modal-title"></h3>
+      <img src="" alt="" id="modal-image" />
+      <p id="modal-description"></p>
+    </div>
+  </div>
+
+  <script>
+   // Countdown timer for the upcoming events button
+    function startCountdown(seconds) {
+      let timer = seconds; const timerEl = document.getElementById('timer'); if (!timerEl) return;
+      setInterval(() => {
+        let h = Math.floor(timer / 3600); let m = Math.floor((timer % 3600) / 60); let s = timer % 60;
+        timerEl.textContent = `T-${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        if (timer > 0) timer--;
+      }, 1000);
+    }
+    // Set a plausible countdown from the current date for realism
+const launchTime = new Date('2025-10-14T11:53:00+05:30').getTime();
+const now = new Date().getTime();
+const duration = Math.floor((launchTime - now) / 1000);
+startCountdown(duration > 0 ? duration : 0);
+  
+  
+  const missionDetails = {
+  apollo: {
+    title: "Apollo Moon Missions",
+    img: "apollo.png",
+    description: "The Apollo program was a monumental effort by NASA with the primary goal of landing humans on the Moon and returning them safely to Earth. Beginning with Apollo 7 in 1968 and culminating with Apollo 17 in 1972, NASA conducted eleven manned missions, six of which successfully landed astronauts on the lunar surface. These missions provided an incredible wealth of scientific data about the Moon’s geology, composition, and environment. The Apollo astronauts performed surface experiments, collected rock and soil samples, and deployed scientific instruments that transmitted data back to Earth for years. The iconic Apollo 11 mission in 1969 marked the first human footprint on another celestial body, forever changing humanity's perspective on exploration and our place in the universe. Apollo missions inspired generations, pushed forward technology and engineering capabilities, and laid the groundwork for future space exploration endeavors, including plans for sustainable lunar bases and Mars expeditions. The program demonstrated the possibilities and challenges of human spaceflight beyond low Earth orbit, making it a paramount achievement in space history."
+  },
+  voyager: {
+    title: "Voyager Probes",
+    img: "voyager.png",
+    description:"Launched in 1977, the Voyager 1 and 2 probes are iconic interstellar ambassadors, pioneering deep space exploration. They performed historic flybys of Jupiter, Saturn, Uranus, and Neptune, sending back detailed images and data. Discoveries include volcanoes on Io, new moons, and the structure of planetary rings. After planetary encounters, Voyagers continued toward the edge of the solar system, crossing into interstellar space. They still transmit data about cosmic rays, magnetic fields, and the properties of interstellar medium. Each carries a Golden Record, representing Earth’s cultural diversity for any extraterrestrial finders. The missions have profoundly impacted science, inspiring future generations. Voyager data shaped subsequent planetary missions, informing spacecraft design and exploration techniques. Their journey symbolizes humanity’s quest to understand the universe. The legacy of Voyager endures as both a scientific and cultural milestone in space history"  },
+  pioneer: {
+    title: "Pioneer Missions",
+    img: "pioneer.png",
+    description:"The Pioneer Space Program, launched between 1958 and 1969, laid the foundations for U.S. lunar and interplanetary exploration. Early Pioneers focused on lunar missions, contributing valuable data about space radiation and solar winds. Later missions targeted heliocentric orbit and the outer planets, overcoming significant technical challenges. Although some probes faced failures, lessons learned drove advancements in spacecraft design and safety. Pioneer 10 and 11 made history, journeying to Jupiter and Saturn, providing first-ever close-up images. Long-lived spacecraft from the series transmitted data for decades, expanding knowledge of deep space hazards. Their findings improved models of planetary environments and navigation. The program demonstrated the complexity and risk of interplanetary travel. Pioneer’s achievements influenced future missions like Voyager and Galileo. The legacy remains vital to the history of space science and technological progress."  },
+  mariner: {
+    title: "Mariner Missions",
+    img: "mariner.png",
+    description:"Mariner missions were crucial to early planetary exploration, targeting Venus, Mars, and Mercury with advanced flybys and orbital studies. Beginning in the 1960s, the program achieved historic firsts such as the first successful encounter with another planet. Mariners sent back detailed photographs and data about surface features, atmospheric conditions, and planetary environments. These discoveries revealed volcanic plains on Venus and canyons on Mars, expanding scientific understanding. The missions also measured radiation and temperature, shaping future human spaceflight plans. Technical innovations included early telemetry and remote sensing techniques. Mariner science laid the foundation for later probes and orbital missions. Their success boosted confidence in robotic interplanetary exploration. Mariner findings guided NASA’s planning for more complex explorations. The program remains a cornerstone in the evolution of planetary science and engineering."  },
+  magellan: {
+    title: "Magellan Probe",
+    img: "magellan.png",
+    description:"The Magellan mission was a pioneering NASA space probe launched in 1989, designed to unlock the mysteries of Venus—the planet most similar to Earth in our solar system. Using advanced Synthetic Aperture Radar, Magellan penetrated Venus’s dense, cloud-covered atmosphere to create the first ever global map of its surface and its gravity field, achieving image resolutions between 120 and 300 meters. Over the course of its mission from 1990 to 1994, Magellan mapped 98% of Venus, revealing a world dominated by immense volcanic plains, vast lava flows, and few impact craters, indicating a relatively young and geologically active surface probably shaped by planet-wide eruptions. The mission discovered that Venus lacks plate tectonics like Earth, and its thick, hot atmosphere and absence of water cause surface features to persist for hundreds of millions of years. By precisely measuring topography and planetary gravity, Magellan provided data crucial for understanding Venus’s internal structure and geological history. In 1993, Magellan became the first spacecraft to use aerobraking—a technique now standard for orbiters—by dipping into Venus’s upper atmosphere to adjust its orbit and improve mapping. When its mission was complete, Magellan was intentionally crashed into Venus in 1994, gathering final atmospheric data as it descended, marking the first deliberate end of an operating interplanetary probe. The Magellan mission transformed planetary science, providing insights not only into Venus but also helping refine theories about planetary evolution, geologic processes, and our understanding of Earth’s sister planet."  },
+  galileo: {
+    title: "Galileo Jupiter Orbiter",
+    img: "galileo.png",
+    description:"The Galileo spacecraft was NASA’s first orbiter dedicated to Jupiter, launched in 1989 and arriving in 1995. Galileo studied Jupiter’s atmosphere, magnetosphere, and unique ring system for nearly eight years. The orbiter also investigated the planet’s largest moons, including volcanic Io and icy Europa. Notably, it found evidence suggesting a subsurface ocean on Europa, raising questions about extraterrestrial life. Galileo dropped a probe into Jupiter’s atmosphere, measuring its composition and weather patterns. The mission produced thousands of images, revealing dynamic changes across the system. Despite technical issues with its antenna, Galileo succeeded through innovative engineering. Its insights redefined knowledge of gas giant systems and satellite geology. Galileo’s data guides ongoing studies of Jupiter and informed future missions like Juno and Europa Clipper. The orbiter stands as one of history’s most successful outer planet missions."  },
+  juno: {
+    title: "Juno Jupiter Mission",
+    img: "juno.png",
+    description: "The Juno mission is a groundbreaking NASA endeavor launched to study Jupiter, the largest planet in our solar system. Arriving in orbit around Jupiter in 2016, Juno has provided scientists with an unprecedented look into the planet’s deep atmosphere, magnetic field, and intricate auroras. Equipped with powerful instruments, the spacecraft has revealed critical insights into Jupiter’s internal structure, discovering evidence for a diluted core and complex weather patterns at its poles. Juno’s data has transformed our understanding of how gas giants form and evolve, offering clues about planetary systems beyond our own solar neighborhood. Its continued observations of Jupiter’s immense magnetosphere and gravity have helped refine models of the planet's origins, composition, and its influence on nearby moons, making Juno a pivotal mission in planetary science."
+  },
+  perseverance: {
+    title: "Mars Perseverance Rover",
+    img: "pres.png ",
+    description:"The Mars Perseverance Rover represents NASA’s most advanced search for past microbial life on the Red Planet. Launched in 2020 and landing in Jezero Crater in February 2021, Perseverance is equipped with sophisticated instruments to analyze the planet’s geology, climate, and collect samples for potential return to Earth. The rover hunts for ancient biosignatures in sedimentary rocks, studies weather patterns, and tests technologies for future human expeditions, such as oxygen production from Martian air. Perseverance’s elaborate sample collection and caching will allow future missions to transport Martian material to Earth, marking a historic next step in planetary science. Its findings are expected to answer fundamental questions about Mars’ habitability and prepare humanity for deeper exploration of the solar system."  },
+  jwst: {
+    title: "James Webb Space Telescope",
+    img: "jwst.png",
+    description:"The James Webb Space Telescope (JWST), launched in December 2021, is humanity’s premier observatory designed to unlock the mysteries of the universe's earliest epochs. Positioned nearly 1.5 million kilometers from Earth, JWST observes infrared light, allowing astronomers to peer back in time to study the formation of the first galaxies, stars, and planetary systems. Its revolutionary capabilities have already led to detailed images and spectra of exoplanets, distant galaxies, and stellar nurseries that were previously invisible to telescopes. By exploring the universe’s origins and searching for the building blocks of life, JWST is revolutionizing our understanding of the cosmos and reshaping modern astrophysics."  },
+  tianwen: {
+    title: "Chandrayan 3 Mission",
+    img: "chand.png",
+    description:"Chandrayaan-3 is India’s third lunar mission, successfully demonstrating the country’s capability in soft landing and rover deployment on the Moon’s south polar region. Launched on July 14, 2023, by the Geosynchronous Satellite Launch Vehicle Mark III (LVM3) from Sriharikota, the spacecraft reached lunar orbit on August 5, 2023, and made a historic soft landing near the Moon’s south pole on August 23, 2023. This achievement positioned India as the first nation to land in this unexplored, scientifically significant lunar region and the fourth globally to execute a soft landing on the Moon. The mission consists of a propulsion module, lander (Vikram), and rover (Pragyan), designed to carry out in-situ scientific experiments and technology demonstrations for navigation and communication. Chandrayaan-3 builds on previous missions by focusing on surface exploration, mineralogical analysis, and measuring lunar plasma and seismic activity using advanced instruments. Its scientific investigations aim to deepen understanding of lunar geology and potential water ice reserves critical for future human missions. The mission also showcases India’s advancements in cryogenic engines, autonomous roving, and landing technology, strengthening its global space leadership. With a planned operational period covering one lunar day (about 14 Earth days), Chandrayaan-3 represents a significant stride in interplanetary science and exploration. Its success fosters national pride and international collaboration, positioning India as a key player in lunar and space research."},
+  ingenuity: {
+    title: "Ingenuity Helicopter",
+    img: "helicopter.png",
+    description:"The Ingenuity Helicopter is a pioneering NASA technology demonstration that achieved the first powered, controlled flight on Mars, marking a historic milestone in extraterrestrial exploration. Delivered to the Martian surface by the Perseverance rover in February 2021, Ingenuity departed from traditional space exploration by being a small, lightweight rotorcraft designed to test the ability to fly in Mars’ thin atmosphere, which is only about 1% as dense as Earth's. Over its mission duration, Ingenuity has completed multiple flights, showcasing agility, endurance, and spatial awareness in an alien environment. It serves as a scout for Perseverance, capturing aerial images and assessing terrain to help plan rover routes. These successful flights have opened new pathways for aerial robotics on other planets and moons, expanding the scope of data acquisition. Ingenuity’s technology demonstrates potential for future Martian exploration vehicles to access difficult terrain unreachable by rovers. By defying gravity on another world, it has inspired innovations in planetary science and engineering. Its achievements have exceeded all initial expectations and extended its mission beyond mere technology demonstration to contributing valuable scientific data. Ingenuity truly redefined what is possible for the exploration of planetary atmospheres beyond Earth."},
+  osiris: {
+    title: "OSIRIS-REx Asteroid Mission",
+    img: "oris.png",
+    description:"OSIRIS-REx is NASA’s remarkable mission to rendezvous with, study, and sample asteroid Bennu. Launched in 2016, the spacecraft orbited Bennu, mapped its surface, and collected pristine regolith samples to return to Earth. The mission aims to unravel the secrets of the early solar system by analyzing Bennu’s composition, which may hold clues to the origin of water and organic molecules on Earth. OSIRIS-REx set new standards for asteroid science and planetary defense, as its findings will enhance our knowledge of potential impact hazards and inform strategies for asteroid mitigation"  },
+  artemis: {
+    title: "Artemis Moon Missions",
+    img: "artemis.png",
+    description:"NASA’s Artemis program marks humanity’s return to the Moon with the goal of establishing a sustainable human presence. Artemis I was an uncrewed mission that tested the new Space Launch System and Orion spacecraft, paving the way for crewed flights. Artemis II will send astronauts around the Moon for the first time since Apollo, testing deep-space travel systems. Artemis III plans the first crewed lunar landing since 1972, aiming to land the first woman and person of color. The missions focus on scientific discovery, resource utilization, and advanced technology development. Artemis will build the Gateway lunar space station and lay groundwork for future Mars travel. International collaboration is key, with contributions from partners worldwide. Surface operations will include extended lunar stays and unprecedented research. The program inspires future generations of explorers and engineers. Artemis represents a bold new chapter in lunar exploration and global space partnership."  },
+  dragonfly: {
+    title: "Dragonfly Titan Mission",
+    img: "dragonfly.png",
+    description:"Dragonfly is an ambitious NASA mission set to explore Titan, Saturn’s largest moon, with a revolutionary rotorcraft. Launching in 2028 and arriving in 2034, Dragonfly will make the first fully controlled flights on Titan’s surface. Its unique drone design enables travel between different terrains, sampling organic dunes, craters, and icy regions. The mission aims to study prebiotic chemistry—compounds that might reveal clues about life’s origins. Titan has a dense atmosphere and liquid methane lakes, offering environments similar to early Earth. Dragonfly will search for evidence of past or present life and analyze the moon’s surface and sub-surface. Instruments will investigate organic molecules and potential water ice reservoirs. The mission will reveal Titan’s habitability and open new frontiers for astrobiology. Dragonfly’s technology could guide future aerial missions to other planets and moons. This exploration may transform our understanding of solar system chemistry and life’s potential beyond Earth"  },
+  exomars: {
+    title: "ExoMars Mission",
+    img: "exomars.png",
+    description:"The ExoMars program is a collaborative effort between ESA and Roscosmos, designed to search for signs of life on Mars. It consists of the Trace Gas Orbiter, launched in 2016, and the upcoming Rosalind Franklin rover. The orbiter studies Mars’ atmosphere, detecting gases linked to biological or geological activity. The rover will drill beneath the surface, retrieving samples shielded from radiation. Its scientific payload is optimized for identifying biosignatures and organic compounds. ExoMars also tests new entry, descent, and landing technologies vital for future missions. The findings could reveal Mars’ ancient habitability and the presence of water or life. The program aims to demonstrate key robotic operations for interplanetary exploration. Lessons from past mission challenges guide technical improvements. ExoMars strengthens international cooperation in space science. Its discoveries will help shape the future of Martian research and crewed exploration."  },
+  interstellar: {
+    title: "Interstellar Probe",
+    img: "interstellar.png",
+    description:"NASA’s proposed Interstellar Probe aims to study the boundary of the heliosphere and venture into interstellar space. Planned for launch in the late 2030s or early 2040s, the spacecraft would travel faster than any previous probe. Its journey begins with a Jupiter flyby for a gravity assist, then heads beyond the influence of the Sun. The probe will map interactions between solar wind and interstellar medium, offering insights into our cosmic neighborhood. It is designed for a 50-year mission, relying on advanced radioisotope power. Instrumentation includes magnetometers, dust analyzers, and spectrometers to study plasma and energetic particles. The probe could fly by minor planets, gathering valuable data en route. This mission builds on the legacy of Voyager, extending our reach farther than ever. Studying the heliosphere’s edge will reveal new aspects of solar and galactic physics. The Interstellar Probe may change our perspective on the solar system’s place in the Milky Way."  },
+  "ice-mapper": {
+    title: "Mars Ice Mapper",
+    img: "icemapper.png",
+    description:"Mars Ice Mapper is a planned international mission to locate and characterize subsurface ice on Mars, essential for future human exploration. Using advanced radar scanning, the orbiter will search for ice deposits within 5–10 meters of the surface. The project targets mid-latitude regions most accessible for landers and potential habitats. Data will guide site selection for crewed missions, offering water resources for life support and fuel production. Ice Mapper’s maps will support engineering constraints, helping avoid rocky hazards and optimizing safe landings. The mission also aims to inform Mars’ climate history and geology. Findings may help design scientific studies, like ice coring for astrobiology. International collaboration multiplies the technical expertise and scientific returns. Mars Ice Mapper advances practical human spaceflight preparation. Its high-value science will shape Mars settlement strategies and exploration planning."  },
+  "lunar-polar": {
+    title: "Lunar Polar Exploration",
+    img: "lpe.png",
+    description:"The Lunar Polar Exploration Mission is a joint effort primarily led by JAXA and ISRO, aiming to explore the Moon’s south polar region. This area is thought to hold water ice, which could be critical for future lunar operations. The mission features a lander and a powerful rover, equipped to sample and analyze subsurface materials. Precision landing and nighttime survival technologies are tested in harsh polar conditions. Instruments will prospect for volatiles and analyze mineralogy near permanently shadowed regions. Results may reveal the extent and nature of lunar water, a key resource for fuel and life support. LUPEX fosters international collaboration for technology exchange and joint science. The mission’s findings will guide the development of sustainable lunar habitats. It also informs strategies for future crewed missions and long-term presence. Exploration of the polar region marks a new phase in utilizing the Moon’s natural resources"  }
+};
+
+
+    const modal = document.getElementById('mission-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalImage = document.getElementById('modal-image');
+    const modalDescription = document.getElementById('modal-description');
+    const closeBtn = modal.querySelector('.modal-close');
+
+    function openModal(missionId) {
+      const mission = missionDetails[missionId];
+      if (!mission) return;
+
+      modalTitle.textContent = mission.title;
+      modalImage.src = mission.img;
+      modalImage.alt = mission.title;
+      modalDescription.textContent = mission.description;
+      modal.classList.add('is-visible');
+
+      modal.querySelector('.modal-content').focus();
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.remove('is-visible');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.learn-more').forEach(button => {
+      button.addEventListener('click', (e) => {
+        openModal(button.getAttribute('data-mission'));
+      });
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', e => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && modal.classList.contains('is-visible')) closeModal();
+    });
+
+    // Starfield canvas background animation
+    const canvas = document.getElementById('star-field');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let stars = [];
+
+    function initCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      stars = [];
+      for (let i = 0; i < 150; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 1.5 + 0.5,
+          alpha: Math.random(),
+          decreasing: Math.random() > 0.5,
+          vx: (Math.random() - 0.5) * 0.1,
+          vy: (Math.random() - 0.5) * 0.1
+        });
+      }
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, width, height);
+      stars.forEach(star => {
+        if (star.decreasing) {
+          star.alpha -= 0.007;
+          if (star.alpha <= 0.1) star.decreasing = false;
+        } else {
+          star.alpha += 0.007;
+          if (star.alpha >= 1) star.decreasing = true;
+        }
+        star.x += star.vx;
+        star.y += star.vy;
+        if (star.x < 0 || star.x > width) star.vx = -star.vx;
+        if (star.y < 0 || star.y > height) star.vy = -star.vy;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+        ctx.fill();
+      });
+    }
+
+    window.addEventListener('resize', initCanvas);
+
+    function animateStars() {
+      drawStars();
+      requestAnimationFrame(animateStars);
+    }
+
+    initCanvas();
+    animateStars();
+
+    // Fade-up scroll animation
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    }, { rootMargin: '0px', threshold: 0.15 });
+
+    document.querySelectorAll('.fade-up-section').forEach(el => observer.observe(el));
+  </script>
+  <footer>
+  <div class="footer-container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <img src="mylogo.png" alt="StellerAtlas Logo" class="logo-footer" />
+        <p>
+          Your one-stop platform for all things space, astrophysics, and
+          astronomy. Explore the cosmos with us.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="missions.html">Missions</a></li>
+          <li><a href="solar-system.html">Solar System</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="news.html">News</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Learn</h4>
+        <ul>
+          <li><a href="blogs.html">Blogs</a></li>
+          <li><a href="astronomy.html">Astronomy 101</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <ul>
+          <li><a href="about.html">About StellerAtlas</a></li>
+          <li><a href="team.html">Our Team</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="community.html">Community</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <div class="social-icons">
+          <a href="#" aria-label="X formerly Twitter"><img src="x.png" alt="X" /></a>
+          <a href="#" aria-label="Instagram"><img src="insta.png" alt="Instagram" /></a>
+          <a href="#" aria-label="YouTube"><img src="yt.png" alt="YouTube" /></a>
+          <a href="#" aria-label="Facebook"><img src="fb.png" alt="Facebook" /></a>
+        </div>
+        <h4 style="margin-top: 30px">Newsletter</h4>
+        <form class="newsletter-form">
+          <input type="email" placeholder="your.email@example.com" required />
+          <button type="submit">SUB</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 CosmicEcho. All Rights Reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script>
+window.AstroWidget = (function() {
+        let w_mediaRecorder = null;
+        let w_chunks = [];
+        let w_cameraOn = false;
+        let w_ctx = null; 
+        let w_isOpen = false; // Track if widget is open
+
+        function initAudio() {
+            if (!w_ctx) w_ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (w_ctx.state === 'suspended') w_ctx.resume();
+        }
+
+        function toggle() {
+            const overlay = document.getElementById('astro-overlay');
+            w_isOpen = (overlay.style.display === 'flex');
+            
+            if (w_isOpen) {
+                overlay.style.display = 'none';
+                w_isOpen = false;
+            } else {
+                overlay.style.display = 'flex';
+                w_isOpen = true;
+                initAudio();
+            }
+        }
+
+        // --- SPACEBAR LISTENER FOR WIDGET ---
+        document.addEventListener('keydown', (e) => {
+            // Only activate if widget is OPEN and space is pressed
+            if (w_isOpen && e.code === 'Space' && !e.repeat) {
+                startListening();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (w_isOpen && e.code === 'Space') {
+                stopListening();
+            }
+        });
+        // -------------------------------------
+
+        async function toggleCamera() {
+            const video = document.getElementById('w-camera-preview');
+            const btn = document.getElementById('w-vision-btn');
+            if (!w_cameraOn) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                    video.srcObject = stream; video.style.display = 'block';
+                    w_cameraOn = true; btn.classList.add('active');
+                } catch(e) { alert("Camera Permission Denied"); }
+            } else {
+                if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                video.style.display = 'none'; w_cameraOn = false; btn.classList.remove('active');
+            }
+        }
+
+        async function startListening() {
+            initAudio();
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                w_mediaRecorder = new MediaRecorder(stream);
+                w_chunks = [];
+                w_mediaRecorder.ondataavailable = e => w_chunks.push(e.data);
+                w_mediaRecorder.onstop = sendData;
+                w_mediaRecorder.start();
+                
+                document.querySelector('.widget-mic').classList.add('listening');
+                document.getElementById('w-status').innerText = "Listening...";
+                playTone(400);
+            } catch(e) { 
+                alert("Microphone Needed."); 
+            }
+        }
+
+        function stopListening() {
+            if(w_mediaRecorder && w_mediaRecorder.state !== 'inactive') w_mediaRecorder.stop();
+            document.querySelector('.widget-mic').classList.remove('listening');
+            document.getElementById('w-status').innerText = "Thinking...";
+            playTone(300);
+        }
+
+        async function sendData() {
+            const blob = new Blob(w_chunks, {type: 'audio/wav'});
+            const formData = new FormData();
+            formData.append("audio_data", blob, "voice.wav");
+
+            if(w_cameraOn) {
+                const vid = document.getElementById('w-camera-preview');
+                const can = document.getElementById('w-snapshot-canvas');
+                can.width = vid.videoWidth; can.height = vid.videoHeight;
+                can.getContext('2d').drawImage(vid, 0, 0);
+                const imgBlob = await new Promise(r => can.toBlob(r, 'image/jpeg'));
+                formData.append("image_data", imgBlob, "frame.jpg");
+            }
+
+            let start = Date.now();
+            fetch('/process_audio', {method: 'POST', body: formData})
+            .then(r => r.json())
+            .then(d => {
+                let lat = (Date.now() - start)/1000;
+                document.getElementById('w-latency').innerText = lat.toFixed(2) + 's';
+                document.getElementById('w-status').innerText = "Speaking...";
+                
+                if(d.sonification_data?.length > 0) {
+                    playMusic(d.sonification_data, () => { if(d.audio_base64) playAudio(d.audio_base64); });
+                } else if(d.audio_base64) {
+                    playAudio(d.audio_base64);
+                }
+            })
+            .catch(e => { console.error(e); document.getElementById('w-status').innerText = "Offline?"; });
+        }
+
+        function playTone(f) {
+            if(!w_ctx) return;
+            const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+            o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(w_ctx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.1); o.stop(w_ctx.currentTime+0.1);
+        }
+        function playMusic(d, cb) {
+            let i=0; let iv = setInterval(() => {
+                if(i>=d.length) { clearInterval(iv); cb(); return; }
+                const o = w_ctx.createOscillator(); const g = w_ctx.createGain();
+                o.type='triangle'; o.frequency.value=200+(d[i]*6); o.connect(g); g.connect(w_ctx.destination);
+                o.start(); g.gain.exponentialRampToValueAtTime(0.001, w_ctx.currentTime+0.15); o.stop(w_ctx.currentTime+0.15);
+                i++;
+            }, 120);
+        }
+        function playAudio(b64) {
+            new Audio("data:audio/mp3;base64,"+b64).play();
+        }
+
+        return { toggle, toggleCamera, startListening, stopListening };
+    })();
+    </script>
+</body>
+</html>

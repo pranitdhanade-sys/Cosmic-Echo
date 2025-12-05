@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stellar-Sight | The Blind Astronomer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Exo+2:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        /* --- CORE THEME --- */
+        :root {
+            --primary: #ffffff;
+            --accent: #ffd860; /* Stellar Gold */
+            --accent-glow: rgba(255, 216, 96, 0.4);
+            --bg: #000000;
+            --glass: rgba(20, 20, 30, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            color: var(--primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- BACKGROUND --- */
+        video#bg-video {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            object-fit: cover; z-index: -2; pointer-events: none; opacity: 0.4;
+        }
+        canvas#star-field {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+
+        
+        /* --- MAIN DASHBOARD --- */
+        .dashboard {
+            flex-grow: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            position: relative; z-index: 10;
+        }
+    
+        h1 {
+            font-family: 'Exo 2', sans-serif; font-size: 4.5rem; margin: 0; padding-top: 6%; padding-bottom: 2%; font-weight: 900;
+            background: linear-gradient(180deg, #fff, #888); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; text-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .tagline {
+            color: var(--accent); font-size: 2rem; margin-bottom: 50px; letter-spacing: 4px;
+            text-transform: uppercase; font-weight: 600;
+        }
+
+        /* --- MIC BUTTON --- */
+        .mic-wrapper { 
+            position: relative; width: 160px; height: 160px; cursor: pointer; transition: 0.3s; margin: 0 auto;
+        }
+        .mic-wrapper:hover { transform: scale(1.05); }
+        .mic-ring {
+            position: absolute; top:0; left:0; width:97%; height:99%;
+            border: 3px solid var(--accent); border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 216, 96, 0.2);
+        }
+        .mic-core {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 75%; height: 75%; background: rgba(255, 216, 96, 0.1);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--accent); backdrop-filter: blur(5px);
+        }
+        .mic-icon { font-size: 3rem; color: var(--accent); }
+        
+        .mic-wrapper.listening .mic-ring {
+            border-color: #fff; border-top-color: transparent;
+            animation: spin 1.5s linear infinite; box-shadow: 0 0 60px var(--accent);
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- VISION BUTTON --- */
+        .vision-btn {
+            margin-top: 40px; background: transparent; border: 1px solid var(--accent);
+            color: var(--accent); padding: 12px 35px; border-radius: 30px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: 0.3s;
+            font-size: 1rem;
+        }
+        .vision-btn:hover { background: rgba(255, 216, 96, 0.1); box-shadow: 0 0 20px var(--accent-glow); }
+        .vision-btn.active { background: var(--accent); color: #000; box-shadow: 0 0 40px var(--accent-glow); }
+
+        .instructions { margin-top: 20px; color: #f4f1f1; font-size: 0.9rem; }
+        .key { color: #fff; font-weight: 700; background: #333; padding: 2px 8px; border-radius: 4px; }
+
+        /* --- HUD & CAMERA --- */
+        #hud {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(10,10,10,0.95); padding: 15px 40px; border-radius: 50px;
+            border: 1px solid var(--accent); display: flex; align-items: center; gap: 30px;
+            opacity: 0; transition: 0.3s; pointer-events: none; z-index: 2000; box-shadow: 0 10px 40px #000;
+        }
+        #hud.active { opacity: 1; }
+        .hud-text { font-weight: 600; color: #fff; }
+        .latency { color: #0f0; font-family: monospace; font-size: 0.8rem; }
+        
+        #camera-preview {
+            position: fixed; bottom: 120px; right: 20px; width: 220px;
+            border: 2px solid var(--accent); border-radius: 15px; display: none; transform: scaleX(-1);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8); z-index: 1500;
+        }
+        #snapshot-canvas { display: none; }
+        /* Navigation Bar */
+        nav.navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 40px;
+        }
+
+        .navbar-logo img {
+            height: 80px;
+            width: auto;
+            transition: transform var(--transition-fast), filter var(--transition-fast);
+        }
+
+        .navbar-logo img:hover {
+            transform: scale(1.08);
+            filter: drop-shadow(0 0 8px var(--accent-color));
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar-menu a {
+            color: #ececec;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.04rem;
+            letter-spacing: 0.03em;
+            padding: 8px 15px;
+            transition: color var(--transition-fast);
+            position: relative;
+        }
+
+        .navbar-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform var(--transition-fast);
+        }
+
+        .navbar-menu a:hover {
+            color: var(--primary-color);
+        }
+
+        .navbar-menu a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.active {
+            color: var(--accent-color);
+        }
+
+        .navbar-menu a.active::after {
+            transform: scaleX(1);
+        }
+
+        .navbar-menu a.login-btn {
+            background: var(--accent-color);
+            color: var(--dark-bg);
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .navbar-menu a.login-btn:hover {
+            background: #ffed4e;
+            color: black;
+        }
+
+        .navbar-menu a.login-btn::after {
+            display: none;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop playsinline id="bg-video"><source src="bg.mp4" type="video/mp4"></video>
+    <canvas id="star-field"></canvas>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="homepage.html" class="navbar-logo"><img src="mylogo.png" alt="StellerAtlas Logo" style="height: 80px;"></a>
+        <div class="navbar-menu">
+            <a href="homepage.html">HOME</a>
+            <a href="blogpage.html">BLOGS</a>
+            <a href="astronomy.html">ASTRONOMY</a>
+            <a href="resources.html">RESOURCES</a>
+            <a href="community.html">COMMUNITY</a>
+            <a href="missions.html">MISSIONS</a>
+            <a href="pricing.html" class="active">PRICING</a>
+            <a href="login.html" class="login-btn">LOGIN</a>
+        </div>
+    </nav>
+    <div class="dashboard">
+        <h1>THE COSMOS AT LIGHT SPEED</h1>
+        <p class="tagline">Astrophysics Solutions for People in a Hurry</p>
+
+        <div class="mic-wrapper" id="mic-btn" onmousedown="startListening()" onmouseup="stopListening()">
+            <div class="mic-ring"></div>
+            <div class="mic-core"><i class="fa-solid fa-microphone mic-icon"></i></div>
+        </div>
+        
+        <p class="instructions">Hold <span class="key">Spacebar</span> or Click Mic to Speak</p>
+
+        <button class="vision-btn" id="vision-btn" onclick="toggleCamera()">
+            <i class="fa-solid fa-camera"></i> Enable Vision
+        </button>
+    </div>
+
+    <div id="hud">
+        <div id="hud-text" class="hud-text">System Ready.</div>
+        <div class="latency" id="latency-meter">0.00s</div>
+    </div>
+    <video id="camera-preview" autoplay playsinline></video>
+    <canvas id="snapshot-canvas"></canvas>
+
+    <script>
+        // --- STARFIELD ---
+        const canvas = document.getElementById('star-field'); const ctx = canvas.getContext('2d');
+        let width, height, stars = [];
+        function initStars() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; stars = []; for(let i=0; i<150; i++) stars.push({x: Math.random()*width, y: Math.random()*height, r: Math.random()*1.5}); }
+        function draw() { ctx.clearRect(0,0,width,height); ctx.fillStyle = "white"; stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.28); ctx.fill(); }); requestAnimationFrame(draw); }
+        window.onresize = initStars; initStars(); draw();
+
+        // --- AI LOGIC ---
+        let isRecording = false, mediaRecorder = null, audioChunks = [], isCameraOn = false;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        async function toggleCamera() {
+            const btn = document.getElementById('vision-btn');
+            const video = document.getElementById('camera-preview');
+            if(!isCameraOn) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                    video.srcObject = stream; video.style.display = 'block';
+                    btn.classList.add('active'); btn.innerHTML = '<i class="fa-solid fa-eye"></i> Vision Active'; isCameraOn = true;
+                } catch(e) { alert("Camera Denied"); }
+            } else {
+                if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+                video.style.display = 'none';
+                btn.classList.remove('active'); btn.innerHTML = '<i class="fa-solid fa-camera"></i> Enable Vision'; isCameraOn = false;
+            }
+            btn.blur();
+        }
+
+        document.addEventListener('keydown', e => {
+            if(e.code === 'Space' && !e.repeat && !isRecording) { isRecording = true; startListening(); }
+        });
+        document.addEventListener('keyup', e => {
+            if(e.code === 'Space' && isRecording) { isRecording = false; stopListening(); }
+        });
+
+        async function startListening() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = sendData;
+                mediaRecorder.start();
+                
+                document.querySelector('.mic-wrapper').classList.add('listening');
+                document.getElementById('hud').classList.add('active');
+                document.getElementById('hud-text').innerText = "Listening...";
+                playTone(400, 0.1);
+            } catch (e) { alert("Mic Needed"); }
+        }
+
+        function stopListening() {
+            if(mediaRecorder) mediaRecorder.stop();
+            document.querySelector('.mic-wrapper').classList.remove('listening');
+            document.getElementById('hud-text').innerText = "Analyzing...";
+            playTone(300, 0.1);
+        }
+
+        async function sendData() {
+            const audioBlob = new Blob(audioChunks, {type: 'audio/wav'});
+            const formData = new FormData();
+            formData.append("audio_data", audioBlob, "voice.wav");
+
+            if(isCameraOn) {
+                const video = document.getElementById('camera-preview');
+                const canvas = document.getElementById('snapshot-canvas');
+                canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                const imageBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg'));
+                formData.append("image_data", imageBlob, "frame.jpg");
+            }
+
+            let start = Date.now();
+            fetch('/process_audio', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                let lat = (Date.now() - start)/1000;
+                document.getElementById('latency-meter').innerText = lat.toFixed(2) + "s";
+                if(data.error) throw new Error(data.error);
+                
+                document.getElementById('hud-text').innerText = "Speaking...";
+                if(data.sonification_data?.length > 0) {
+                    playDataMusic(data.sonification_data, () => { if(data.audio_base64) playAudio(data.audio_base64); });
+                } else if(data.audio_base64) {
+                    playAudio(data.audio_base64);
+                }
+            })
+            .catch(e => { console.error(e); document.getElementById('hud-text').innerText = "Error"; });
+        }
+
+        function playTone(freq, dur, type='sine') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.value = freq;
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); 
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+            osc.stop(audioCtx.currentTime + dur);
+        }
+
+        function playDataMusic(data, cb) {
+            let i=0;
+            let iv = setInterval(() => {
+                if(i >= data.length) { clearInterval(iv); cb(); return; }
+                playTone(200 + (data[i] * 6), 0.15, 'triangle'); i++;
+            }, 120);
+        }
+
+        function playAudio(b64) {
+            const aud = new Audio("data:audio/mp3;base64," + b64);
+            aud.play();
+            aud.onended = () => document.getElementById('hud').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
